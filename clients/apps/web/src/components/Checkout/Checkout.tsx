@@ -129,6 +129,7 @@ const Checkout = ({ embed: _embed, theme: _theme }: CheckoutProps) => {
     return (
       <ShadowBox className="dark:bg-polar-900 flex flex-col gap-y-12 bg-white">
         <ShadowBox className="dark:bg-polar-800 dark:border-polar-700 flex flex-col gap-6 rounded-3xl bg-gray-50">
+          <CheckoutProductSwitcher checkout={checkout} update={update} />
           <CheckoutPricing checkout={checkout} update={update} />
         </ShadowBox>
         <CheckoutForm
@@ -145,14 +146,14 @@ const Checkout = ({ embed: _embed, theme: _theme }: CheckoutProps) => {
   }
 
   return (
-    <ShadowBoxOnMd className="md:dark:border-polar-700 dark:divide-polar-700 grid w-full auto-cols-fr grid-flow-row auto-rows-max gap-y-24 divide-transparent overflow-hidden md:grid-flow-col md:grid-rows-1 md:items-stretch md:gap-y-0 md:divide-x md:border md:border-gray-100 md:p-0">
+    <ShadowBoxOnMd className="md:dark:border-polar-700 dark:divide-polar-700 grid w-full auto-cols-fr grid-flow-row auto-rows-max gap-y-12 divide-transparent overflow-hidden md:grid-flow-col md:grid-rows-1 md:items-stretch md:gap-y-0 md:gap-y-24 md:divide-x md:border md:border-gray-100 md:p-0">
       <div className="flex flex-col gap-y-8 md:p-12">
         <CheckoutProductInfo
           organization={checkout.organization}
           product={checkout.product}
         />
-        <CheckoutCard checkout={checkout} update={update} />
         <CheckoutProductSwitcher checkout={checkout} update={update} />
+        <CheckoutCard checkout={checkout} update={update} />
       </div>
       <div className="flex flex-col gap-y-8 md:p-12 lg:p-20">
         <CheckoutForm

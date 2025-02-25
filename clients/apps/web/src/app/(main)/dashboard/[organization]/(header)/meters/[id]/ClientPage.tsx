@@ -1,11 +1,14 @@
 'use client'
 
+import { Events } from '@/components/Events/Events'
 import { DashboardBody } from '@/components/Layout/DashboardLayout'
 import { MeterChart } from '@/components/Meter/MeterChart'
 import { MeterContextView } from '@/components/Meter/MeterContextView'
-import { MeterEvents } from '@/components/Meter/MeterEvents'
 import MeterEventsTab from '@/components/Meter/MeterEventsTab'
 import { MeterGetStarted } from '@/components/Meter/MeterGetStarted'
+import { MeterUpdateModal } from '@/components/Meter/MeterUpdateModal'
+import { InlineModal } from '@/components/Modal/InlineModal'
+import { useModal } from '@/components/Modal/useModal'
 import Spinner from '@/components/Shared/Spinner'
 import {
   useMeter,
@@ -29,17 +32,20 @@ import {
   TabsTrigger,
 } from '@polar-sh/ui/components/atoms/Tabs'
 import { endOfMonth, startOfMonth, subDays, subMonths } from 'date-fns'
-import Link from 'next/link'
 import { useMemo } from 'react'
 
 export default function ClientPage({
   meter: _meter,
-  organization,
 }: {
   meter: schemas['Meter']
-  organization: schemas['Organization']
 }) {
   const { data: meter } = useMeter(_meter.id, _meter)
+
+  const {
+    isShown: isMeterUpdateModalShown,
+    show: showMeterUpdateModal,
+    hide: hideMeterUpdateModal,
+  } = useModal()
 
   const startChart = useMemo(() => subDays(new UTCDate(), 7), [])
   const endChart = useMemo(() => new UTCDate(), [])
@@ -84,13 +90,11 @@ export default function ClientPage({
         </div>
       }
       header={
-        <div className="flex flex-row gap-x-4">
-          <Link
-            href={`/dashboard/${organization.slug}/meters/${meter.id}/edit`}
-          >
-            <Button variant="secondary">Edit Meter</Button>
-          </Link>
-          <Button className="text-lg" size="icon" variant="secondary">
+        <div className="flex flex-row gap-x-2">
+          <Button variant="secondary" onClick={showMeterUpdateModal}>
+            Edit Meter
+          </Button>
+          <Button className="h-10 w-10 text-lg" size="icon" variant="secondary">
             <MoreVert
               className="dark:text-polar-500 text-gray-500"
               fontSize="inherit"
@@ -100,6 +104,7 @@ export default function ClientPage({
       }
       contextView={<MeterContextView meter={meter} />}
       contextViewClassName="xl:max-w-[400px]"
+      wide
     >
       <Tabs defaultValue="overview" className="flex flex-col">
         <TabsList className="mb-4">
@@ -193,7 +198,7 @@ export default function ClientPage({
                   Recently received meter events
                 </p>
               </div>
-              <MeterEvents events={meterEvents} />
+              <Events events={meterEvents} />
             </div>
           ) : (
             <MeterGetStarted meter={meter} />
@@ -203,6 +208,14 @@ export default function ClientPage({
           <MeterEventsTab meter={meter} />
         </TabsContent>
       </Tabs>
+
+      <InlineModal
+        isShown={isMeterUpdateModalShown}
+        hide={hideMeterUpdateModal}
+        modalContent={
+          <MeterUpdateModal meter={meter} hide={hideMeterUpdateModal} />
+        }
+      />
     </DashboardBody>
   )
 }

@@ -159,7 +159,7 @@ const AuthenticationSettings = () => {
     React.ReactNode
   > = {
     off: (
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-4">
         {currentUser && (
           <>
             <div className="text-sm">
@@ -170,7 +170,7 @@ const AuthenticationSettings = () => {
               />
             </div>
             <Button onClick={() => setUpdateEmailStage('form')}>
-              Change email
+              Change Email
             </Button>
           </>
         )}
@@ -208,13 +208,13 @@ const AuthenticationSettings = () => {
           <ShadowListGroup.Item>
             <GitHubAuthenticationMethod
               oauthAccount={githubAccount}
-              returnTo={pathname || '/purchases'}
+              returnTo={pathname || '/start'}
             />
           </ShadowListGroup.Item>
           <ShadowListGroup.Item>
             <GoogleAuthenticationMethod
               oauthAccount={googleAccount}
-              returnTo={pathname || '/purchases'}
+              returnTo={pathname || '/start'}
             />
           </ShadowListGroup.Item>
           <ShadowListGroup.Item>

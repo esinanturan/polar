@@ -794,40 +794,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/payment_methods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List */
-        get: operations["payment_methods:list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/payment_methods/{id}/detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Detach */
-        post: operations["payment_methods:detach"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/accounts/search": {
         parameters: {
             query?: never;
@@ -2739,7 +2705,7 @@ export interface paths {
         };
         /**
          * List Benefit Grants
-         * @description List benefits grants of the authenticated customer or user.
+         * @description List benefits grants of the authenticated customer.
          */
         get: operations["customer_portal:benefit-grants:list"];
         put?: never;
@@ -2759,7 +2725,7 @@ export interface paths {
         };
         /**
          * Get Benefit Grant
-         * @description Get a benefit grant by ID for the authenticated customer or user.
+         * @description Get a benefit grant by ID for the authenticated customer.
          */
         get: operations["customer_portal:benefit-grants:get"];
         put?: never;
@@ -2769,12 +2735,12 @@ export interface paths {
         head?: never;
         /**
          * Update Benefit Grant
-         * @description Update a benefit grant for the authenticated customer or user.
+         * @description Update a benefit grant for the authenticated customer.
          */
         patch: operations["customer_portal:benefit-grants:update"];
         trace?: never;
     };
-    "/v1/customer-portal/customers/{id}": {
+    "/v1/customer-portal/customers/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -2783,12 +2749,60 @@ export interface paths {
         };
         /**
          * Get Customer
-         * @description Get a customer by ID for the authenticated customer or user.
+         * @description Get authenticated customer.
          */
         get: operations["customer_portal:customers:get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Customer
+         * @description Update authenticated customer.
+         */
+        patch: operations["customer_portal:customers:update"];
+        trace?: never;
+    };
+    "/v1/customer-portal/customers/me/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Customer Payment Methods
+         * @description Get saved payment methods of the authenticated customer.
+         */
+        get: operations["customer_portal:customers:get_payment_methods"];
+        put?: never;
+        /**
+         * Add Customer Payment Method
+         * @description Add a payment method to the authenticated customer.
+         */
+        post: operations["customer_portal:customers:add_payment_method"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/customer-portal/customers/me/payment-methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Customer Payment Method
+         * @description Delete a payment method from the authenticated customer.
+         */
+        delete: operations["customer_portal:customers:delete_payment_method"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3002,7 +3016,7 @@ export interface paths {
         };
         /**
          * List Orders
-         * @description List orders of the authenticated customer or user.
+         * @description List orders of the authenticated customer.
          */
         get: operations["customer_portal:orders:list"];
         put?: never;
@@ -3022,7 +3036,7 @@ export interface paths {
         };
         /**
          * Get Order
-         * @description Get an order by ID for the authenticated customer or user.
+         * @description Get an order by ID for the authenticated customer.
          */
         get: operations["customer_portal:orders:get"];
         put?: never;
@@ -3082,7 +3096,7 @@ export interface paths {
         };
         /**
          * List Subscriptions
-         * @description List subscriptions of the authenticated customer or user.
+         * @description List subscriptions of the authenticated customer.
          */
         get: operations["customer_portal:subscriptions:list"];
         put?: never;
@@ -3102,21 +3116,21 @@ export interface paths {
         };
         /**
          * Get Subscription
-         * @description Get a subscription for the authenticated customer or user.
+         * @description Get a subscription for the authenticated customer.
          */
         get: operations["customer_portal:subscriptions:get"];
         put?: never;
         post?: never;
         /**
          * Cancel Subscription
-         * @description Cancel a subscription of the authenticated customer or user.
+         * @description Cancel a subscription of the authenticated customer.
          */
         delete: operations["customer_portal:subscriptions:cancel"];
         options?: never;
         head?: never;
         /**
          * Update Subscription
-         * @description Update a subscription of the authenticated customer or user.
+         * @description Update a subscription of the authenticated customer.
          */
         patch: operations["customer_portal:subscriptions:update"];
         trace?: never;
@@ -8629,6 +8643,15 @@ export interface components {
             /** Products */
             products: components["schemas"]["CustomerProduct"][];
         };
+        /** CustomerPaymentMethodCreate */
+        CustomerPaymentMethodCreate: {
+            /** Confirmation Token Id */
+            confirmation_token_id: string;
+            /** Set Default */
+            set_default: boolean;
+            /** Return Url */
+            return_url: string;
+        };
         /** CustomerPortalCustomer */
         CustomerPortalCustomer: {
             /**
@@ -8664,6 +8687,16 @@ export interface components {
             oauth_accounts: {
                 [key: string]: components["schemas"]["CustomerPortalOAuthAccount"];
             };
+        };
+        /** CustomerPortalCustomerUpdate */
+        CustomerPortalCustomerUpdate: {
+            /** Email */
+            email?: string | null;
+            /** Name */
+            name?: string | null;
+            billing_address?: components["schemas"]["Address"] | null;
+            /** Tax Id */
+            tax_id?: string | null;
         };
         /** CustomerPortalOAuthAccount */
         CustomerPortalOAuthAccount: {
@@ -11242,12 +11275,6 @@ export interface components {
             items: components["schemas"]["Organization"][];
             pagination: components["schemas"]["Pagination"];
         };
-        /** ListResource[PaymentMethod] */
-        ListResource_PaymentMethod_: {
-            /** Items */
-            items: components["schemas"]["PaymentMethod"][];
-            pagination: components["schemas"]["Pagination"];
-        };
         /** ListResource[PersonalAccessToken] */
         ListResource_PersonalAccessToken_: {
             /** Items */
@@ -11294,6 +11321,12 @@ export interface components {
         ListResource_Transaction_: {
             /** Items */
             items: components["schemas"]["Transaction"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        /** ListResource[Union[PaymentMethodCard, PaymentMethodGeneric]] */
+        ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__: {
+            /** Items */
+            items: (components["schemas"]["PaymentMethodCard"] | components["schemas"]["PaymentMethodGeneric"])[];
             pagination: components["schemas"]["Pagination"];
         };
         /** ListResource[WebhookDelivery] */
@@ -12874,23 +12907,50 @@ export interface components {
             /** Detail */
             detail: string;
         };
-        /** PaymentMethod */
-        PaymentMethod: {
-            /** Stripe Payment Method Id */
-            stripe_payment_method_id: string;
+        /** PaymentMethodCard */
+        PaymentMethodCard: {
+            /** Id */
+            id: string;
             /**
              * Type
-             * @enum {unknown}
+             * @constant
              */
-            type: "card" | null;
+            type: "card";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Default */
+            default: boolean;
+            card: components["schemas"]["PaymentMethodCardData"];
+        };
+        /** PaymentMethodCardData */
+        PaymentMethodCardData: {
             /** Brand */
-            brand: string | null;
+            brand: string;
             /** Last4 */
             last4: string;
             /** Exp Month */
             exp_month: number;
             /** Exp Year */
             exp_year: number;
+            /** Wallet */
+            wallet?: string | null;
+        };
+        /** PaymentMethodGeneric */
+        PaymentMethodGeneric: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Default */
+            default: boolean;
         };
         /**
          * PaymentProcessor
@@ -17161,57 +17221,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    "payment_methods:list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListResource_PaymentMethod_"];
-                };
-            };
-        };
-    };
-    "payment_methods:detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentMethod"];
-                };
             };
             /** @description Validation Error */
             422: {
@@ -22303,10 +22312,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                /** @description The customer ID. */
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -22320,7 +22326,113 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerPortalCustomer"];
                 };
             };
-            /** @description Customer not found. */
+        };
+    };
+    "customer_portal:customers:update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPortalCustomerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Customer updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPortalCustomer"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:get_payment_methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:add_payment_method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPaymentMethodCreate"];
+            };
+        };
+        responses: {
+            /** @description Payment method created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodCard"] | components["schemas"]["PaymentMethodGeneric"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:delete_payment_method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment method deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Payment method not found. */
             404: {
                 headers: {
                     [name: string]: unknown;
