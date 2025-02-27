@@ -27,7 +27,7 @@
           "issue_funding"
         ],
         "summary": "List External Organizations",
-        "description": "List external organizations.",
+        "description": "List external organizations.\n\n**Scopes**: `external_organizations:read`",
         "operationId": "external_organizations:list",
         "parameters": [
           {
@@ -213,6 +213,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "external_organizations",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -247,7 +250,7 @@
           "issue_funding"
         ],
         "summary": "List Repositories",
-        "description": "List repositories.",
+        "description": "List repositories.\n\n**Scopes**: `repositories:read` `repositories:write`",
         "operationId": "repositories:list",
         "parameters": [
           {
@@ -475,6 +478,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "repositories",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -509,7 +515,7 @@
           "issue_funding"
         ],
         "summary": "Get Repository",
-        "description": "Get a repository by ID.",
+        "description": "Get a repository by ID.\n\n**Scopes**: `repositories:read` `repositories:write`",
         "operationId": "repositories:get",
         "parameters": [
           {
@@ -566,6 +572,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "repositories",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -598,7 +607,7 @@
           "issue_funding"
         ],
         "summary": "Update Repository",
-        "description": "Update a repository.",
+        "description": "Update a repository.\n\n**Scopes**: `repositories:write`",
         "operationId": "repositories:update",
         "parameters": [
           {
@@ -674,6 +683,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "repositories",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -708,7 +720,7 @@
           "featured"
         ],
         "summary": "List Organizations",
-        "description": "List organizations.",
+        "description": "List organizations.\n\n**Scopes**: `organizations:read` `organizations:write`",
         "operationId": "organizations:list",
         "parameters": [
           {
@@ -825,6 +837,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "organizations",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -857,7 +872,7 @@
           "featured"
         ],
         "summary": "Create Organization",
-        "description": "Create an organization.",
+        "description": "Create an organization.\n\n**Scopes**: `organizations:write`",
         "operationId": "organizations:create",
         "requestBody": {
           "required": true,
@@ -894,6 +909,9 @@
         "x-polar-allowed-subjects": [
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "organizations",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -928,7 +946,7 @@
           "featured"
         ],
         "summary": "Get Organization",
-        "description": "Get an organization by ID.",
+        "description": "Get an organization by ID.\n\n**Scopes**: `organizations:read` `organizations:write`",
         "operationId": "organizations:get",
         "parameters": [
           {
@@ -984,6 +1002,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "organizations",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -1016,7 +1037,7 @@
           "featured"
         ],
         "summary": "Update Organization",
-        "description": "Update an organization.",
+        "description": "Update an organization.\n\n**Scopes**: `organizations:write`",
         "operationId": "organizations:update",
         "parameters": [
           {
@@ -1092,6 +1113,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "organizations",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -1122,10 +1146,11 @@
       "get": {
         "tags": [
           "subscriptions",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "List Subscriptions",
-        "description": "List subscriptions.",
+        "description": "List subscriptions.\n\n**Scopes**: `subscriptions:read` `subscriptions:write`",
         "operationId": "subscriptions:list",
         "parameters": [
           {
@@ -1384,6 +1409,13 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "subscriptions"
+          ]
+        },
         "x-speakeasy-group": "subscriptions",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -1414,10 +1446,11 @@
       "get": {
         "tags": [
           "subscriptions",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Export Subscriptions",
-        "description": "Export subscriptions as a CSV file.",
+        "description": "Export subscriptions as a CSV file.\n\n**Scopes**: `subscriptions:read` `subscriptions:write`",
         "operationId": "subscriptions:export",
         "parameters": [
           {
@@ -1483,6 +1516,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "subscriptions"
+          ]
+        },
         "x-speakeasy-group": "subscriptions",
         "x-speakeasy-name-override": "export",
         "x-codeSamples": [
@@ -1513,10 +1553,11 @@
       "get": {
         "tags": [
           "subscriptions",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Get Subscription",
-        "description": "Get a subscription by ID.",
+        "description": "Get a subscription by ID.\n\n**Scopes**: `subscriptions:write`",
         "operationId": "subscriptions:get",
         "parameters": [
           {
@@ -1568,6 +1609,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "subscriptions"
+          ]
+        },
         "x-speakeasy-group": "subscriptions",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -1596,10 +1644,11 @@
       "patch": {
         "tags": [
           "subscriptions",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Update Subscription",
-        "description": "Update a subscription.",
+        "description": "Update a subscription.\n\n**Scopes**: `subscriptions:write`",
         "operationId": "subscriptions:update",
         "parameters": [
           {
@@ -1671,6 +1720,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "subscriptions"
+          ]
+        },
         "x-speakeasy-group": "subscriptions",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -1699,10 +1755,11 @@
       "delete": {
         "tags": [
           "subscriptions",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Revoke Subscription",
-        "description": "Revoke a subscription, i.e cancel immediately.",
+        "description": "Revoke a subscription, i.e cancel immediately.\n\n**Scopes**: `subscriptions:write`",
         "operationId": "subscriptions:revoke",
         "parameters": [
           {
@@ -1764,6 +1821,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "subscriptions"
+          ]
+        },
         "x-speakeasy-group": "subscriptions",
         "x-speakeasy-name-override": "revoke",
         "x-codeSamples": [
@@ -1908,6 +1972,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "advertisements",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -1989,6 +2056,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "advertisements",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -2023,7 +2093,7 @@
           "documented"
         ],
         "summary": "List Clients",
-        "description": "List OAuth2 clients.",
+        "description": "List OAuth2 clients.\n\n**Scopes**:",
         "operationId": "oauth2:clients:list",
         "parameters": [
           {
@@ -2097,6 +2167,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2.clients",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -2131,7 +2204,7 @@
           "documented"
         ],
         "summary": "Create Client",
-        "description": "Create an OAuth2 client.",
+        "description": "Create an OAuth2 client.\n\n**Scopes**:",
         "operationId": "oauth2:clients:oauth2:create_client",
         "requestBody": {
           "content": {
@@ -2166,6 +2239,9 @@
         "x-polar-allowed-subjects": [
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2.clients",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -2200,7 +2276,7 @@
           "documented"
         ],
         "summary": "Get Client",
-        "description": "Get an OAuth2 client by Client ID.",
+        "description": "Get an OAuth2 client by Client ID.\n\n**Scopes**:",
         "operationId": "oauth2:clients:oauth2:get_client",
         "parameters": [
           {
@@ -2237,6 +2313,9 @@
           "Anonymous",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2.clients",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -2269,7 +2348,7 @@
           "documented"
         ],
         "summary": "Update Client",
-        "description": "Update an OAuth2 client.",
+        "description": "Update an OAuth2 client.\n\n**Scopes**:",
         "operationId": "oauth2:clients:oauth2:update_client",
         "parameters": [
           {
@@ -2316,6 +2395,9 @@
           "Anonymous",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2.clients",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -2348,7 +2430,7 @@
           "documented"
         ],
         "summary": "Delete Client",
-        "description": "Delete an OAuth2 client.",
+        "description": "Delete an OAuth2 client.\n\n**Scopes**:",
         "operationId": "oauth2:clients:oauth2:delete_client",
         "parameters": [
           {
@@ -2385,6 +2467,9 @@
           "Anonymous",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2.clients",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -2418,6 +2503,7 @@
           "documented"
         ],
         "summary": "Authorize",
+        "description": "**Scopes**:",
         "operationId": "oauth2:authorize",
         "responses": {
           "200": {
@@ -2450,6 +2536,9 @@
           "Anonymous",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2",
         "x-speakeasy-name-override": "authorize",
         "x-codeSamples": [
@@ -2515,13 +2604,16 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2",
         "x-speakeasy-name-override": "token",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Token(ctx, operations.CreateOauth2RequestTokenRequestBodyAuthorizationCode(\n        components.Onev11oauth21tokenPostXComponentsAuthorizationCodeTokenRequest{\n            ClientID: \"\u003cid\u003e\",\n            ClientSecret: \"\u003cvalue\u003e\",\n            Code: \"\u003cvalue\u003e\",\n            RedirectURI: \"https://talkative-barracks.com\",\n        },\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.TokenResponse != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Token(ctx, operations.CreateOauth2RequestTokenRequestBodyAuthorizationCodeTokenRequest(\n        components.AuthorizationCodeTokenRequest{\n            ClientID: \"\u003cid\u003e\",\n            ClientSecret: \"\u003cvalue\u003e\",\n            Code: \"\u003cvalue\u003e\",\n            RedirectURI: \"https://talkative-barracks.com\",\n        },\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.TokenResponse != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -2536,7 +2628,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\Onev11oauth21tokenPostXComponentsAuthorizationCodeTokenRequest(\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n    code: '\u003cvalue\u003e',\n    redirectUri: 'https://old-fort.name',\n);\n\n$response = $sdk-\u003eoauth2-\u003etoken(\n    request: $request\n);\n\nif ($response-\u003etokenResponse !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\AuthorizationCodeTokenRequest(\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n    code: '\u003cvalue\u003e',\n    redirectUri: 'https://old-fort.name',\n);\n\n$response = $sdk-\u003eoauth2-\u003etoken(\n    request: $request\n);\n\nif ($response-\u003etokenResponse !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -2573,13 +2665,16 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2",
         "x-speakeasy-name-override": "revoke",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Revoke(ctx, operations.Oauth2RevokeTokenRevokeTokenRequest{\n        Token: \"\u003cvalue\u003e\",\n        ClientID: \"\u003cid\u003e\",\n        ClientSecret: \"\u003cvalue\u003e\",\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.RevokeTokenResponse != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Revoke(ctx, components.RevokeTokenRequest{\n        Token: \"\u003cvalue\u003e\",\n        ClientID: \"\u003cid\u003e\",\n        ClientSecret: \"\u003cvalue\u003e\",\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.RevokeTokenResponse != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -2594,7 +2689,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Operations;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Operations\\Oauth2RevokeTokenRevokeTokenRequest(\n    token: '\u003cvalue\u003e',\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003eoauth2-\u003erevoke(\n    request: $request\n);\n\nif ($response-\u003erevokeTokenResponse !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\RevokeTokenRequest(\n    token: '\u003cvalue\u003e',\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003eoauth2-\u003erevoke(\n    request: $request\n);\n\nif ($response-\u003erevokeTokenResponse !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -2631,13 +2726,16 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2",
         "x-speakeasy-name-override": "introspect",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Introspect(ctx, operations.Oauth2IntrospectTokenIntrospectTokenRequest{\n        Token: \"\u003cvalue\u003e\",\n        ClientID: \"\u003cid\u003e\",\n        ClientSecret: \"\u003cvalue\u003e\",\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.IntrospectTokenResponse != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Oauth2.Introspect(ctx, components.IntrospectTokenRequest{\n        Token: \"\u003cvalue\u003e\",\n        ClientID: \"\u003cid\u003e\",\n        ClientSecret: \"\u003cvalue\u003e\",\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.IntrospectTokenResponse != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -2652,7 +2750,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Operations;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Operations\\Oauth2IntrospectTokenIntrospectTokenRequest(\n    token: '\u003cvalue\u003e',\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003eoauth2-\u003eintrospect(\n    request: $request\n);\n\nif ($response-\u003eintrospectTokenResponse !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\IntrospectTokenRequest(\n    token: '\u003cvalue\u003e',\n    clientId: '\u003cid\u003e',\n    clientSecret: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003eoauth2-\u003eintrospect(\n    request: $request\n);\n\nif ($response-\u003eintrospectTokenResponse !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -2688,6 +2786,9 @@
           }
         },
         "x-speakeasy-name-override": "userinfo",
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "oauth2",
         "x-codeSamples": [
           {
@@ -2720,7 +2821,7 @@
           "documented"
         ],
         "summary": "List Benefits",
-        "description": "List benefits.",
+        "description": "List benefits.\n\n**Scopes**: `benefits:read` `benefits:write`",
         "operationId": "benefits:list",
         "parameters": [
           {
@@ -2858,6 +2959,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -2889,7 +2993,7 @@
           "documented"
         ],
         "summary": "Create Benefit",
-        "description": "Create a benefit.",
+        "description": "Create a benefit.\n\n**Scopes**: `benefits:write`",
         "operationId": "benefits:create",
         "requestBody": {
           "required": true,
@@ -2928,6 +3032,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -2961,7 +3068,7 @@
           "documented"
         ],
         "summary": "Get Benefit",
-        "description": "Get a benefit by ID.",
+        "description": "Get a benefit by ID.\n\n**Scopes**: `benefits:read` `benefits:write`",
         "operationId": "benefits:get",
         "parameters": [
           {
@@ -3018,6 +3125,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -3049,7 +3159,7 @@
           "documented"
         ],
         "summary": "Update Benefit",
-        "description": "Update a benefit.",
+        "description": "Update a benefit.\n\n**Scopes**: `benefits:write`",
         "operationId": "benefits:update",
         "parameters": [
           {
@@ -3146,6 +3256,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -3177,7 +3290,7 @@
           "documented"
         ],
         "summary": "Delete Benefit",
-        "description": "Delete a benefit.\n\n\u003e [!WARNING]\n\u003e Every grants associated with the benefit will be revoked.\n\u003e Users will lose access to the benefit.",
+        "description": "Delete a benefit.\n\n\u003e [!WARNING]\n\u003e Every grants associated with the benefit will be revoked.\n\u003e Users will lose access to the benefit.\n\n**Scopes**: `benefits:write`",
         "operationId": "benefits:delete",
         "parameters": [
           {
@@ -3236,6 +3349,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -3269,7 +3385,7 @@
           "documented"
         ],
         "summary": "List Benefit Grants",
-        "description": "List the individual grants for a benefit.\n\nIt's especially useful to check if a user has been granted a benefit.",
+        "description": "List the individual grants for a benefit.\n\nIt's especially useful to check if a user has been granted a benefit.\n\n**Scopes**: `benefits:read` `benefits:write`",
         "operationId": "benefits:grants",
         "parameters": [
           {
@@ -3416,6 +3532,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "benefits",
         "x-speakeasy-name-override": "grants",
         "x-codeSamples": [
@@ -3447,10 +3566,11 @@
         "tags": [
           "products",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "List Products",
-        "description": "List products.",
+        "description": "List products.\n\n**Scopes**: `products:read` `products:write`",
         "operationId": "products:list",
         "parameters": [
           {
@@ -3717,6 +3837,13 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "products"
+          ]
+        },
         "x-speakeasy-group": "products",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -3746,10 +3873,11 @@
         "tags": [
           "products",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Create Product",
-        "description": "Create a product.",
+        "description": "Create a product.\n\n**Scopes**: `products:write`",
         "operationId": "products:create",
         "requestBody": {
           "required": true,
@@ -3787,13 +3915,20 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "products"
+          ]
+        },
         "x-speakeasy-group": "products",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Products.Create(ctx, components.CreateProductCreateProductRecurringCreate(\n        components.ProductRecurringCreate{\n            Name: \"\u003cvalue\u003e\",\n            Prices: components.CreateProductRecurringCreatePricesArrayOfProductPriceRecurringFixedCreate(\n                []components.ProductPriceRecurringFixedCreate{\n                    components.ProductPriceRecurringFixedCreate{\n                        PriceAmount: 796474,\n                        RecurringInterval: components.SubscriptionRecurringIntervalYear,\n                    },\n                },\n            ),\n        },\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.Product != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.Products.Create(ctx, components.ProductCreate{\n        Name: \"\u003cvalue\u003e\",\n        RecurringInterval: components.SubscriptionRecurringIntervalMonth.ToPointer(),\n        Prices: []components.ProductCreatePrices{\n            components.CreateProductCreatePricesProductPriceCustomCreate(\n                components.ProductPriceCustomCreate{},\n            ),\n            components.CreateProductCreatePricesProductPriceFixedCreate(\n                components.ProductPriceFixedCreate{\n                    PriceAmount: 69025,\n                },\n            ),\n        },\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.Product != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -3808,7 +3943,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\ProductRecurringCreate(\n    name: '\u003cvalue\u003e',\n    prices: [\n        new Components\\ProductPriceRecurringFreeCreate(\n            recurringInterval: Components\\SubscriptionRecurringInterval::Month,\n        ),\n    ],\n);\n\n$response = $sdk-\u003eproducts-\u003ecreate(\n    request: $request\n);\n\nif ($response-\u003eproduct !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\ProductCreate(\n    name: '\u003cvalue\u003e',\n    recurringInterval: Components\\SubscriptionRecurringInterval::Month,\n    prices: [\n        new Components\\ProductPriceCustomCreate(),\n    ],\n);\n\n$response = $sdk-\u003eproducts-\u003ecreate(\n    request: $request\n);\n\nif ($response-\u003eproduct !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -3818,10 +3953,11 @@
         "tags": [
           "products",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Get Product",
-        "description": "Get a product by ID.",
+        "description": "Get a product by ID.\n\n**Scopes**: `products:read` `products:write`",
         "operationId": "products:get",
         "parameters": [
           {
@@ -3877,6 +4013,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "products"
+          ]
+        },
         "x-speakeasy-group": "products",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -3906,10 +4049,11 @@
         "tags": [
           "products",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Update Product",
-        "description": "Update a product.",
+        "description": "Update a product.\n\n**Scopes**: `products:write`",
         "operationId": "products:update",
         "parameters": [
           {
@@ -3985,6 +4129,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "products"
+          ]
+        },
         "x-speakeasy-group": "products",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -4016,10 +4167,11 @@
         "tags": [
           "products",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Update Product Benefits",
-        "description": "Update benefits granted by a product.",
+        "description": "Update benefits granted by a product.\n\n**Scopes**: `products:write`",
         "operationId": "products:update_benefits",
         "parameters": [
           {
@@ -4095,6 +4247,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "products"
+          ]
+        },
         "x-speakeasy-group": "products",
         "x-speakeasy-name-override": "update_benefits",
         "x-codeSamples": [
@@ -4125,10 +4284,11 @@
       "get": {
         "tags": [
           "orders",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "List Orders",
-        "description": "List orders.",
+        "description": "List orders.\n\n**Scopes**: `orders:read`",
         "operationId": "orders:list",
         "parameters": [
           {
@@ -4407,6 +4567,13 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "orders"
+          ]
+        },
         "x-speakeasy-group": "orders",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -4437,10 +4604,11 @@
       "get": {
         "tags": [
           "orders",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Get Order",
-        "description": "Get an order by ID.",
+        "description": "Get an order by ID.\n\n**Scopes**: `orders:read`",
         "operationId": "orders:get",
         "parameters": [
           {
@@ -4492,6 +4660,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "orders"
+          ]
+        },
         "x-speakeasy-group": "orders",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -4522,10 +4697,11 @@
       "get": {
         "tags": [
           "orders",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Get Order Invoice",
-        "description": "Get an order's invoice data.",
+        "description": "Get an order's invoice data.\n\n**Scopes**: `orders:read`",
         "operationId": "orders:invoice",
         "parameters": [
           {
@@ -4577,6 +4753,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "orders"
+          ]
+        },
         "x-speakeasy-group": "orders",
         "x-speakeasy-name-override": "invoice",
         "x-codeSamples": [
@@ -4610,7 +4793,7 @@
           "documented"
         ],
         "summary": "List Refunds",
-        "description": "List products.",
+        "description": "List products.\n\n**Scopes**: `refunds:read` `refunds:write`",
         "operationId": "refunds:list",
         "parameters": [
           {
@@ -4877,6 +5060,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "refunds",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -4908,7 +5094,7 @@
           "documented"
         ],
         "summary": "Create Refund",
-        "description": "Create a refund.",
+        "description": "Create a refund.\n\n**Scopes**: `refunds:write`",
         "operationId": "refunds:create",
         "requestBody": {
           "required": true,
@@ -4969,6 +5155,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "refunds",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -5003,7 +5192,7 @@
           "featured"
         ],
         "summary": "List Checkout Sessions",
-        "description": "List checkout sessions.",
+        "description": "List checkout sessions.\n\n**Scopes**: `checkouts:read` `checkouts:write`",
         "operationId": "checkouts:list",
         "parameters": [
           {
@@ -5178,6 +5367,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -5195,6 +5387,11 @@
             "lang": "typescript",
             "label": "Typescript (SDK)",
             "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.checkouts.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+          },
+          {
+            "lang": "php",
+            "label": "PHP (SDK)",
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Operations;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Operations\\CheckoutsListRequest();\n\n$responses = $sdk-\u003echeckouts-\u003elist(\n    request: $request\n);\n\n\nforeach ($responses as $response) {\n    if ($response-\u003estatusCode === 200) {\n        // handle response\n    }\n}"
           }
         ]
       },
@@ -5205,7 +5402,7 @@
           "featured"
         ],
         "summary": "Create Checkout Session",
-        "description": "Create a checkout session.",
+        "description": "Create a checkout session.\n\n**Scopes**: `checkouts:write`",
         "operationId": "checkouts:create",
         "requestBody": {
           "required": true,
@@ -5243,6 +5440,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -5260,6 +5460,11 @@
             "lang": "typescript",
             "label": "Typescript (SDK)",
             "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.checkouts.create({\n    allowDiscountCodes: true,\n    productId: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          },
+          {
+            "lang": "php",
+            "label": "PHP (SDK)",
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\CheckoutProductCreate(\n    productId: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003echeckouts-\u003ecreate(\n    request: $request\n);\n\nif ($response-\u003echeckout !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -5272,7 +5477,7 @@
           "featured"
         ],
         "summary": "Get Checkout Session",
-        "description": "Get a checkout session by ID.",
+        "description": "Get a checkout session by ID.\n\n**Scopes**: `checkouts:read` `checkouts:write`",
         "operationId": "checkouts:get",
         "parameters": [
           {
@@ -5324,6 +5529,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -5341,6 +5549,11 @@
             "lang": "typescript",
             "label": "Typescript (SDK)",
             "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.checkouts.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          },
+          {
+            "lang": "php",
+            "label": "PHP (SDK)",
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n\n\n$response = $sdk-\u003echeckouts-\u003eget(\n    id: '\u003cvalue\u003e'\n);\n\nif ($response-\u003echeckout !== null) {\n    // handle response\n}"
           }
         ]
       },
@@ -5351,7 +5564,7 @@
           "featured"
         ],
         "summary": "Update Checkout Session",
-        "description": "Update a checkout session.",
+        "description": "Update a checkout session.\n\n**Scopes**: `checkouts:write`",
         "operationId": "checkouts:update",
         "parameters": [
           {
@@ -5423,6 +5636,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -5499,6 +5715,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "client_get",
         "x-codeSamples": [
@@ -5516,6 +5735,11 @@
             "lang": "typescript",
             "label": "Typescript (SDK)",
             "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.checkouts.clientGet({\n    clientSecret: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          },
+          {
+            "lang": "php",
+            "label": "PHP (SDK)",
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n\n\n$response = $sdk-\u003echeckouts-\u003eclientGet(\n    clientSecret: '\u003cvalue\u003e'\n);\n\nif ($response-\u003echeckoutPublic !== null) {\n    // handle response\n}"
           }
         ]
       },
@@ -5593,6 +5817,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "client_update",
         "x-codeSamples": [
@@ -5622,7 +5849,7 @@
           "featured"
         ],
         "summary": "Confirm Checkout Session from Client",
-        "description": "Confirm a checkout session by client secret.\n\nOrders and subscriptions will be processed.",
+        "description": "Confirm a checkout session by client secret.\n\nOrders and subscriptions will be processed.\n\n**Scopes**:",
         "operationId": "checkouts:client_confirm",
         "parameters": [
           {
@@ -5703,6 +5930,9 @@
           "Anonymous",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkouts",
         "x-speakeasy-name-override": "client_confirm",
         "x-codeSamples": [
@@ -5731,7 +5961,7 @@
           "documented"
         ],
         "summary": "List Files",
-        "description": "List files.",
+        "description": "List files.\n\n**Scopes**: `files:write`",
         "operationId": "files:list",
         "parameters": [
           {
@@ -5851,6 +6081,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "files",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -5882,7 +6115,7 @@
           "documented"
         ],
         "summary": "Create File",
-        "description": "Create a file.",
+        "description": "Create a file.\n\n**Scopes**: `files:write`",
         "operationId": "files:create",
         "requestBody": {
           "required": true,
@@ -5920,6 +6153,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "files",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -5953,7 +6189,7 @@
           "documented"
         ],
         "summary": "Complete File Upload",
-        "description": "Complete a file upload.",
+        "description": "Complete a file upload.\n\n**Scopes**: `files:write`",
         "operationId": "files:uploaded",
         "parameters": [
           {
@@ -6044,6 +6280,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "files",
         "x-speakeasy-name-override": "uploaded",
         "x-codeSamples": [
@@ -6077,7 +6316,7 @@
           "documented"
         ],
         "summary": "Update File",
-        "description": "Update a file.",
+        "description": "Update a file.\n\n**Scopes**: `files:write`",
         "operationId": "files:update",
         "parameters": [
           {
@@ -6168,6 +6407,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "files",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -6199,7 +6441,7 @@
           "documented"
         ],
         "summary": "Delete File",
-        "description": "Delete a file.",
+        "description": "Delete a file.\n\n**Scopes**: `files:write`",
         "operationId": "files:delete",
         "parameters": [
           {
@@ -6252,6 +6494,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "files",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -6282,10 +6527,11 @@
       "get": {
         "tags": [
           "metrics",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Get Metrics",
-        "description": "Get metrics about your orders and subscriptions.",
+        "description": "Get metrics about your orders and subscriptions.\n\nCurrency values are output in cents.\n\n**Scopes**: `metrics:read`",
         "operationId": "metrics:get",
         "parameters": [
           {
@@ -6477,6 +6723,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "metrics"
+          ]
+        },
         "x-speakeasy-group": "metrics",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -6507,10 +6760,11 @@
       "get": {
         "tags": [
           "metrics",
-          "documented"
+          "documented",
+          "mcp"
         ],
         "summary": "Get Metrics Limits",
-        "description": "Get the interval limits for the metrics endpoint.",
+        "description": "Get the interval limits for the metrics endpoint.\n\n**Scopes**: `metrics:read`",
         "operationId": "metrics:limits",
         "responses": {
           "200": {
@@ -6528,6 +6782,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "metrics"
+          ]
+        },
         "x-speakeasy-group": "metrics",
         "x-speakeasy-name-override": "limits",
         "x-codeSamples": [
@@ -6562,7 +6823,7 @@
           "featured"
         ],
         "summary": "List License Keys",
-        "description": "Get license keys connected to the given organization \u0026 filters.",
+        "description": "Get license keys connected to the given organization \u0026 filters.\n\n**Scopes**: `license_keys:read` `license_keys:write`",
         "operationId": "license_keys:list",
         "parameters": [
           {
@@ -6733,6 +6994,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "license_keys",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -6767,7 +7031,7 @@
           "featured"
         ],
         "summary": "Get License Key",
-        "description": "Get a license key.",
+        "description": "Get a license key.\n\n**Scopes**: `license_keys:read` `license_keys:write`",
         "operationId": "license_keys:get",
         "parameters": [
           {
@@ -6827,6 +7091,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "license_keys",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -6859,7 +7126,7 @@
           "featured"
         ],
         "summary": "Update License Key",
-        "description": "Update a license key.",
+        "description": "Update a license key.\n\n**Scopes**: `license_keys:write`",
         "operationId": "license_keys:update",
         "parameters": [
           {
@@ -6929,6 +7196,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "license_keys",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -6963,7 +7233,7 @@
           "featured"
         ],
         "summary": "Get Activation",
-        "description": "Get a license key activation.",
+        "description": "Get a license key activation.\n\n**Scopes**: `license_keys:read` `license_keys:write`",
         "operationId": "license_keys:get_activation",
         "parameters": [
           {
@@ -7033,6 +7303,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "license_keys",
         "x-speakeasy-name-override": "get_activation",
         "x-codeSamples": [
@@ -7066,7 +7339,7 @@
           "documented"
         ],
         "summary": "List Checkout Links",
-        "description": "List checkout links.",
+        "description": "List checkout links.\n\n**Scopes**: `checkout_links:read` `checkout_links:write`",
         "operationId": "checkout-links:list",
         "parameters": [
           {
@@ -7241,6 +7514,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkout-links",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -7272,7 +7548,7 @@
           "documented"
         ],
         "summary": "Create Checkout Link",
-        "description": "Create a checkout link.",
+        "description": "Create a checkout link.\n\n**Scopes**: `checkout_links:write`",
         "operationId": "checkout-links:create",
         "requestBody": {
           "required": true,
@@ -7321,13 +7597,16 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkout-links",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CheckoutLinks.Create(ctx, components.CreateCheckoutLinkCreateCheckoutLinkPriceCreate(\n        components.CheckoutLinkPriceCreate{\n            ProductPriceID: \"\u003cvalue\u003e\",\n        },\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CheckoutLink != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CheckoutLinks.Create(ctx, operations.CreateCheckoutLinksCreateCheckoutLinkCreateCheckoutLinkCreateProduct(\n        components.CheckoutLinkCreateProduct{\n            ProductID: \"\u003cvalue\u003e\",\n        },\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CheckoutLink != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -7342,7 +7621,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\CheckoutLinkProductCreate(\n    productId: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003echeckoutLinks-\u003ecreate(\n    request: $request\n);\n\nif ($response-\u003echeckoutLink !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\nuse Polar\\Models\\Components;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n$request = new Components\\CheckoutLinkCreateProduct(\n    productId: '\u003cvalue\u003e',\n);\n\n$response = $sdk-\u003echeckoutLinks-\u003ecreate(\n    request: $request\n);\n\nif ($response-\u003echeckoutLink !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -7354,7 +7633,7 @@
           "documented"
         ],
         "summary": "Get Checkout Link",
-        "description": "Get a checkout link by ID.",
+        "description": "Get a checkout link by ID.\n\n**Scopes**: `checkout_links:read` `checkout_links:write`",
         "operationId": "checkout-links:get",
         "parameters": [
           {
@@ -7406,6 +7685,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkout-links",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -7437,7 +7719,7 @@
           "documented"
         ],
         "summary": "Update Checkout Link",
-        "description": "Update a checkout link.",
+        "description": "Update a checkout link.\n\n**Scopes**: `checkout_links:write`",
         "operationId": "checkout-links:update",
         "parameters": [
           {
@@ -7499,6 +7781,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkout-links",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -7530,7 +7815,7 @@
           "documented"
         ],
         "summary": "Delete Checkout Link",
-        "description": "Delete a checkout link.",
+        "description": "Delete a checkout link.\n\n**Scopes**: `checkout_links:write`",
         "operationId": "checkout-links:delete",
         "parameters": [
           {
@@ -7575,6 +7860,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "checkout-links",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -7608,7 +7896,7 @@
           "documented"
         ],
         "summary": "List Custom Fields",
-        "description": "List custom fields.",
+        "description": "List custom fields.\n\n**Scopes**: `custom_fields:read` `custom_fields:write`",
         "operationId": "custom-fields:list",
         "parameters": [
           {
@@ -7788,6 +8076,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "custom-fields",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -7819,7 +8110,7 @@
           "documented"
         ],
         "summary": "Create Custom Field",
-        "description": "Create a custom field.",
+        "description": "Create a custom field.\n\n**Scopes**: `custom_fields:write`",
         "operationId": "custom-fields:create",
         "requestBody": {
           "required": true,
@@ -7858,6 +8149,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "custom-fields",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -7891,7 +8185,7 @@
           "documented"
         ],
         "summary": "Get Custom Field",
-        "description": "Get a custom field by ID.",
+        "description": "Get a custom field by ID.\n\n**Scopes**: `custom_fields:read` `custom_fields:write`",
         "operationId": "custom-fields:get",
         "parameters": [
           {
@@ -7944,6 +8238,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "custom-fields",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -7975,7 +8272,7 @@
           "documented"
         ],
         "summary": "Update Custom Field",
-        "description": "Update a custom field.",
+        "description": "Update a custom field.\n\n**Scopes**: `custom_fields:write`",
         "operationId": "custom-fields:update",
         "parameters": [
           {
@@ -8038,6 +8335,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "custom-fields",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -8069,7 +8369,7 @@
           "documented"
         ],
         "summary": "Delete Custom Field",
-        "description": "Delete a custom field.",
+        "description": "Delete a custom field.\n\n**Scopes**: `custom_fields:write`",
         "operationId": "custom-fields:delete",
         "parameters": [
           {
@@ -8114,6 +8414,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "custom-fields",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -8148,7 +8451,7 @@
           "documented"
         ],
         "summary": "List Discounts",
-        "description": "List discounts.",
+        "description": "List discounts.\n\n**Scopes**: `discounts:read` `discounts:write`",
         "operationId": "discounts:list",
         "parameters": [
           {
@@ -8303,6 +8606,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "discounts",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -8335,7 +8641,7 @@
           "documented"
         ],
         "summary": "Create Discount",
-        "description": "Create a discount.",
+        "description": "Create a discount.\n\n**Scopes**: `discounts:write`",
         "operationId": "discounts:create",
         "requestBody": {
           "required": true,
@@ -8374,6 +8680,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "discounts",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -8408,7 +8717,7 @@
           "documented"
         ],
         "summary": "Get Discount",
-        "description": "Get a discount by ID.",
+        "description": "Get a discount by ID.\n\n**Scopes**: `discounts:read` `discounts:write`",
         "operationId": "discounts:get",
         "parameters": [
           {
@@ -8461,6 +8770,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "discounts",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -8493,7 +8805,7 @@
           "documented"
         ],
         "summary": "Update Discount",
-        "description": "Update a discount.",
+        "description": "Update a discount.\n\n**Scopes**: `discounts:write`",
         "operationId": "discounts:update",
         "parameters": [
           {
@@ -8556,6 +8868,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "discounts",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -8588,7 +8903,7 @@
           "documented"
         ],
         "summary": "Delete Discount",
-        "description": "Delete a discount.",
+        "description": "Delete a discount.\n\n**Scopes**: `discounts:write`",
         "operationId": "discounts:delete",
         "parameters": [
           {
@@ -8633,6 +8948,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "discounts",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -8664,10 +8982,11 @@
         "tags": [
           "customers",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "List Customers",
-        "description": "List customers.",
+        "description": "List customers.\n\n**Scopes**: `customers:read` `customers:write`",
         "operationId": "customers:list",
         "parameters": [
           {
@@ -8850,6 +9169,13 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "customers"
+          ]
+        },
         "x-speakeasy-group": "customers",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -8879,10 +9205,11 @@
         "tags": [
           "customers",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Create Customer",
-        "description": "Create a customer.",
+        "description": "Create a customer.\n\n**Scopes**: `customers:write`",
         "operationId": "customers:create",
         "requestBody": {
           "required": true,
@@ -8920,6 +9247,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "customers"
+          ]
+        },
         "x-speakeasy-group": "customers",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -8951,10 +9285,11 @@
         "tags": [
           "customers",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Get Customer",
-        "description": "Get a customer by ID.",
+        "description": "Get a customer by ID.\n\n**Scopes**: `customers:read` `customers:write`",
         "operationId": "customers:get",
         "parameters": [
           {
@@ -9006,6 +9341,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "read",
+            "customers"
+          ]
+        },
         "x-speakeasy-group": "customers",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -9035,10 +9377,11 @@
         "tags": [
           "customers",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Update Customer",
-        "description": "Update a customer.",
+        "description": "Update a customer.\n\n**Scopes**: `customers:write`",
         "operationId": "customers:update",
         "parameters": [
           {
@@ -9100,6 +9443,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "customers"
+          ]
+        },
         "x-speakeasy-group": "customers",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -9129,10 +9479,11 @@
         "tags": [
           "customers",
           "documented",
-          "featured"
+          "featured",
+          "mcp"
         ],
         "summary": "Delete Customer",
-        "description": "Delete a customer.\n\nImmediately cancels any active subscriptions and revokes any active benefits.",
+        "description": "Delete a customer.\n\nImmediately cancels any active subscriptions and revokes any active benefits.\n\n**Scopes**: `customers:write`",
         "operationId": "customers:delete",
         "parameters": [
           {
@@ -9177,6 +9528,13 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": false,
+          "scopes": [
+            "write",
+            "customers"
+          ]
+        },
         "x-speakeasy-group": "customers",
         "x-speakeasy-name-override": "delete",
         "x-codeSamples": [
@@ -9211,8 +9569,13 @@
           "documented"
         ],
         "summary": "List Benefit Grants",
-        "description": "List benefits grants of the authenticated customer or user.",
+        "description": "List benefits grants of the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:benefit-grants:list",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "type",
@@ -9459,8 +9822,7 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
@@ -9481,23 +9843,26 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.benefit-grants",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.BenefitGrants.List(ctx, operations.CustomerPortalBenefitGrantsListRequest{})\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerBenefitGrant != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"os\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.BenefitGrants.List(ctx, operations.CustomerPortalBenefitGrantsListRequest{}, operations.CustomerPortalBenefitGrantsListSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerBenefitGrant != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.benefit_grants.list()\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.benefit_grants.list(security=polar_sdk.CustomerPortalBenefitGrantsListSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.list({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -9515,8 +9880,13 @@
           "documented"
         ],
         "summary": "Get Benefit Grant",
-        "description": "Get a benefit grant by ID for the authenticated customer or user.",
+        "description": "Get a benefit grant by ID for the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:benefit-grants:get",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -9565,26 +9935,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.benefit-grants",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.BenefitGrants.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerBenefitGrant != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.BenefitGrants.Get(ctx, operations.CustomerPortalBenefitGrantsGetSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerBenefitGrant != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.benefit_grants.get(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.benefit_grants.get(security=polar_sdk.CustomerPortalBenefitGrantsGetSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.get({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -9600,8 +9972,13 @@
           "documented"
         ],
         "summary": "Update Benefit Grant",
-        "description": "Update a benefit grant for the authenticated customer or user.",
+        "description": "Update a benefit grant for the authenticated customer.\n\n**Scopes**: `customer_portal:write`",
         "operationId": "customer_portal:benefit-grants:update",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -9671,26 +10048,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.benefit-grants",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.BenefitGrants.Update(ctx, \"\u003cvalue\u003e\", components.CreateCustomerBenefitGrantUpdateDownloadables(\n        components.CustomerBenefitGrantDownloadablesUpdate{},\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerBenefitGrant != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.BenefitGrants.Update(ctx, operations.CustomerPortalBenefitGrantsUpdateSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\", components.CreateCustomerBenefitGrantUpdateDownloadables(\n        components.CustomerBenefitGrantDownloadablesUpdate{},\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerBenefitGrant != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.benefit_grants.update(id=\"\u003cvalue\u003e\", customer_benefit_grant_update={\n        \"benefit_type\": \"license_keys\",\n    })\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.benefit_grants.update(security=polar_sdk.CustomerPortalBenefitGrantsUpdateSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\", customer_benefit_grant_update={\n        \"benefit_type\": \"license_keys\",\n    })\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.update({\n    id: \"\u003cvalue\u003e\",\n    customerBenefitGrantUpdate: {},\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.benefitGrants.update({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n    customerBenefitGrantUpdate: {},\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -9700,7 +10079,7 @@
         ]
       }
     },
-    "/v1/customer-portal/customers/{id}": {
+    "/v1/customer-portal/customers/me": {
       "get": {
         "tags": [
           "customer_portal",
@@ -9708,22 +10087,8 @@
           "documented"
         ],
         "summary": "Get Customer",
-        "description": "Get a customer by ID for the authenticated customer or user.",
+        "description": "Get authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:customers:get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid4",
-              "description": "The customer ID.",
-              "title": "Id"
-            },
-            "description": "The customer ID."
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -9734,9 +10099,335 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
+        "x-polar-allowed-subjects": [
+          "Customer"
+        ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
+        "x-speakeasy-group": "customer_portal.customers",
+        "x-speakeasy-name-override": "get",
+        "x-codeSamples": [
+          {
+            "lang": "go",
+            "label": "Go (SDK)",
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Customers.Get(ctx, operations.CustomerPortalCustomersGetSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerPortalCustomer != nil {\n        // handle response\n    }\n}"
+          },
+          {
+            "lang": "python",
+            "label": "Python (SDK)",
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.customers.get(security=polar_sdk.CustomerPortalCustomersGetSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    # Handle response\n    print(res)"
+          },
+          {
+            "lang": "typescript",
+            "label": "Typescript (SDK)",
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.customers.get({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "customer_portal",
+          "customers",
+          "documented"
+        ],
+        "summary": "Update Customer",
+        "description": "Update authenticated customer.\n\n**Scopes**: `customer_portal:write`",
+        "operationId": "customer_portal:customers:update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerPortalCustomerUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalCustomer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
+        "x-polar-allowed-subjects": [
+          "Customer"
+        ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
+        "x-speakeasy-group": "customer_portal.customers",
+        "x-speakeasy-name-override": "update",
+        "x-codeSamples": [
+          {
+            "lang": "go",
+            "label": "Go (SDK)",
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Customers.Update(ctx, components.CustomerPortalCustomerUpdate{}, operations.CustomerPortalCustomersUpdateSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerPortalCustomer != nil {\n        // handle response\n    }\n}"
+          },
+          {
+            "lang": "python",
+            "label": "Python (SDK)",
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.customers.update(security=polar_sdk.CustomerPortalCustomersUpdateSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    # Handle response\n    print(res)"
+          },
+          {
+            "lang": "typescript",
+            "label": "Typescript (SDK)",
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.customers.update({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          }
+        ]
+      }
+    },
+    "/v1/customer-portal/customers/me/payment-methods": {
+      "get": {
+        "tags": [
+          "customer_portal",
+          "customers",
+          "documented"
+        ],
+        "summary": "Get Customer Payment Methods",
+        "description": "Get saved payment methods of the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
+        "operationId": "customer_portal:customers:get_payment_methods",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "description": "Page number, defaults to 1.",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Page number, defaults to 1."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "description": "Size of a page, defaults to 10. Maximum is 100.",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Size of a page, defaults to 10. Maximum is 100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-polar-allowed-subjects": [
+          "Customer"
+        ],
+        "x-speakeasy-pagination": {
+          "type": "offsetLimit",
+          "inputs": [
+            {
+              "name": "page",
+              "in": "parameters",
+              "type": "page"
+            },
+            {
+              "name": "limit",
+              "in": "parameters",
+              "type": "limit"
+            }
+          ],
+          "outputs": {
+            "results": "$.items",
+            "numPages": "$.pagination.max_page"
+          }
+        },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
+        "x-speakeasy-group": "customer_portal.customers",
+        "x-speakeasy-name-override": "get_payment_methods",
+        "x-codeSamples": [
+          {
+            "lang": "go",
+            "label": "Go (SDK)",
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Customers.GetPaymentMethods(ctx, operations.CustomerPortalCustomersGetPaymentMethodsSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, nil, nil)\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceUnionPaymentMethodCardPaymentMethodGeneric != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+          },
+          {
+            "lang": "python",
+            "label": "Python (SDK)",
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.customers.get_payment_methods(security=polar_sdk.CustomerPortalCustomersGetPaymentMethodsSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+          },
+          {
+            "lang": "typescript",
+            "label": "Typescript (SDK)",
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.customers.getPaymentMethods({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "customer_portal",
+          "customers",
+          "documented"
+        ],
+        "summary": "Add Customer Payment Method",
+        "description": "Add a payment method to the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
+        "operationId": "customer_portal:customers:add_payment_method",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerPaymentMethodCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment method created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/PaymentMethodCard"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PaymentMethodGeneric"
+                    }
+                  ],
+                  "title": "Response Customer Portal:Customers:Add Payment Method"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "x-polar-allowed-subjects": [
+          "Customer"
+        ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
+        "x-speakeasy-group": "customer_portal.customers",
+        "x-speakeasy-name-override": "add_payment_method",
+        "x-codeSamples": [
+          {
+            "lang": "go",
+            "label": "Go (SDK)",
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Customers.AddPaymentMethod(ctx, components.CustomerPaymentMethodCreate{\n        ConfirmationTokenID: \"\u003cid\u003e\",\n        SetDefault: false,\n        ReturnURL: \"https://slight-digestive.info\",\n    }, operations.CustomerPortalCustomersAddPaymentMethodSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ResponseCustomerPortalCustomersAddPaymentMethod != nil {\n        // handle response\n    }\n}"
+          },
+          {
+            "lang": "python",
+            "label": "Python (SDK)",
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.customers.add_payment_method(security=polar_sdk.CustomerPortalCustomersAddPaymentMethodSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), request={\n        \"confirmation_token_id\": \"\u003cid\u003e\",\n        \"set_default\": False,\n        \"return_url\": \"https://slight-digestive.info\",\n    })\n\n    # Handle response\n    print(res)"
+          },
+          {
+            "lang": "typescript",
+            "label": "Typescript (SDK)",
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.customers.addPaymentMethod({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    confirmationTokenId: \"\u003cid\u003e\",\n    setDefault: false,\n    returnUrl: \"https://slight-digestive.info\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+          }
+        ]
+      }
+    },
+    "/v1/customer-portal/customers/me/payment-methods/{id}": {
+      "delete": {
+        "tags": [
+          "customer_portal",
+          "customers",
+          "documented"
+        ],
+        "summary": "Delete Customer Payment Method",
+        "description": "Delete a payment method from the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
+        "operationId": "customer_portal:customers:delete_payment_method",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Payment method deleted."
           },
           "404": {
-            "description": "Customer not found.",
+            "description": "Payment method not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9757,31 +10448,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.customers",
-        "x-speakeasy-name-override": "get",
+        "x-speakeasy-name-override": "delete_payment_method",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Customers.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerPortalCustomer != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Customers.DeletePaymentMethod(ctx, operations.CustomerPortalCustomersDeletePaymentMethodSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cid\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.customers.get(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    polar.customer_portal.customers.delete_payment_method(security=polar_sdk.CustomerPortalCustomersDeletePaymentMethodSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cid\u003e\")\n\n    # Use the SDK ..."
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.customers.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
-          },
-          {
-            "lang": "php",
-            "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n\n\n$response = $sdk-\u003ecustomerPortal-\u003ecustomers-\u003eget(\n    id: '\u003cvalue\u003e'\n);\n\nif ($response-\u003ecustomerPortalCustomer !== null) {\n    // handle response\n}"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  await polar.customerPortal.customers.deletePaymentMethod({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cid\u003e\",\n  });\n\n\n}\n\nrun();"
           }
         ]
       }
@@ -9794,7 +10482,13 @@
           "documented"
         ],
         "summary": "List Downloadables",
+        "description": "**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:downloadables:list",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "organization_id",
@@ -9922,8 +10616,7 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
@@ -9944,23 +10637,26 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.downloadables",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Downloadables.List(ctx, nil, nil, nil, nil)\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceDownloadableRead != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Downloadables.List(ctx, operations.CustomerPortalDownloadablesListSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, nil, nil, nil, nil)\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceDownloadableRead != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.downloadables.list()\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.downloadables.list(security=polar_sdk.CustomerPortalDownloadablesListSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.downloadables.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.downloadables.list({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -10022,6 +10718,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.downloadables",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -10057,7 +10756,13 @@
           "featured"
         ],
         "summary": "List License Keys",
+        "description": "**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:license_keys:list",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "organization_id",
@@ -10192,8 +10897,7 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
@@ -10214,23 +10918,26 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.license_keys",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.LicenseKeys.List(ctx, nil, nil, nil, nil)\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceLicenseKeyRead != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.LicenseKeys.List(ctx, operations.CustomerPortalLicenseKeysListSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, nil, nil, nil, nil)\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceLicenseKeyRead != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.license_keys.list()\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.license_keys.list(security=polar_sdk.CustomerPortalLicenseKeysListSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.licenseKeys.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.licenseKeys.list({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -10249,8 +10956,13 @@
           "featured"
         ],
         "summary": "Get License Key",
-        "description": "Get a license key.",
+        "description": "Get a license key.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:license_keys:get",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -10296,26 +11008,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.license_keys",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.LicenseKeys.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.LicenseKeyWithActivations != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.LicenseKeys.Get(ctx, operations.CustomerPortalLicenseKeysGetSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.LicenseKeyWithActivations != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.license_keys.get(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.license_keys.get(security=polar_sdk.CustomerPortalLicenseKeysGetSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.licenseKeys.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.licenseKeys.get({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -10377,6 +11091,9 @@
               }
             }
           }
+        },
+        "x-speakeasy-mcp": {
+          "disabled": true
         },
         "x-speakeasy-group": "customer_portal.license_keys",
         "x-speakeasy-name-override": "validate",
@@ -10467,6 +11184,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.license_keys",
         "x-speakeasy-name-override": "activate",
         "x-codeSamples": [
@@ -10539,6 +11259,9 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.license_keys",
         "x-speakeasy-name-override": "deactivate",
         "x-codeSamples": [
@@ -10573,8 +11296,13 @@
           "documented"
         ],
         "summary": "List Orders",
-        "description": "List orders of the authenticated customer or user.",
+        "description": "List orders of the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:orders:list",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "organization_id",
@@ -10796,8 +11524,7 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
@@ -10818,23 +11545,26 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.orders",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Orders.List(ctx, operations.CustomerPortalOrdersListRequest{})\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerOrder != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"os\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Orders.List(ctx, operations.CustomerPortalOrdersListRequest{}, operations.CustomerPortalOrdersListSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerOrder != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.orders.list()\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.orders.list(security=polar_sdk.CustomerPortalOrdersListSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.orders.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.orders.list({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -10852,8 +11582,13 @@
           "documented"
         ],
         "summary": "Get Order",
-        "description": "Get an order by ID for the authenticated customer or user.",
+        "description": "Get an order by ID for the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:orders:get",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -10901,26 +11636,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.orders",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Orders.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerOrder != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Orders.Get(ctx, operations.CustomerPortalOrdersGetSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerOrder != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.orders.get(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.orders.get(security=polar_sdk.CustomerPortalOrdersGetSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.orders.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.orders.get({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -10938,8 +11675,13 @@
           "documented"
         ],
         "summary": "Get Order Invoice",
-        "description": "Get an order's invoice data.",
+        "description": "Get an order's invoice data.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:orders:invoice",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -10987,26 +11729,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.orders",
         "x-speakeasy-name-override": "invoice",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Orders.Invoice(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerOrderInvoice != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Orders.Invoice(ctx, operations.CustomerPortalOrdersInvoiceSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerOrderInvoice != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.orders.invoice(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.orders.invoice(security=polar_sdk.CustomerPortalOrdersInvoiceSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.orders.invoice({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.orders.invoice({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -11071,13 +11815,16 @@
             }
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.organizations",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Organizations.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.Organization != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Organizations.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerOrganization != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
@@ -11092,7 +11839,7 @@
           {
             "lang": "php",
             "label": "PHP (SDK)",
-            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n\n\n$response = $sdk-\u003ecustomerPortal-\u003eorganizations-\u003eget(\n    slug: '\u003cvalue\u003e'\n);\n\nif ($response-\u003eorganization !== null) {\n    // handle response\n}"
+            "source": "declare(strict_types=1);\n\nrequire 'vendor/autoload.php';\n\nuse Polar;\n\n$sdk = Polar\\Polar::builder()\n    -\u003esetSecurity(\n        '\u003cYOUR_BEARER_TOKEN_HERE\u003e'\n    )\n    -\u003ebuild();\n\n\n\n$response = $sdk-\u003ecustomerPortal-\u003eorganizations-\u003eget(\n    slug: '\u003cvalue\u003e'\n);\n\nif ($response-\u003ecustomerOrganization !== null) {\n    // handle response\n}"
           }
         ]
       }
@@ -11106,8 +11853,13 @@
           "featured"
         ],
         "summary": "List Subscriptions",
-        "description": "List subscriptions of the authenticated customer or user.",
+        "description": "List subscriptions of the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:subscriptions:list",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "organization_id",
@@ -11295,8 +12047,7 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
         "x-speakeasy-pagination": {
           "type": "offsetLimit",
@@ -11317,23 +12068,26 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.subscriptions",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Subscriptions.List(ctx, operations.CustomerPortalSubscriptionsListRequest{})\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerSubscription != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"os\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Subscriptions.List(ctx, operations.CustomerPortalSubscriptionsListRequest{}, operations.CustomerPortalSubscriptionsListSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    })\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.ListResourceCustomerSubscription != nil {\n        for {\n            // handle items\n\n            res, err = res.Next()\n\n            if err != nil {\n                // handle error\n            }\n\n            if res == nil {\n                break\n            }\n        }\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.subscriptions.list()\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.subscriptions.list(security=polar_sdk.CustomerPortalSubscriptionsListSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ))\n\n    while res is not None:\n        # Handle items\n\n        res = res.next()"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.list({});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.list({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {});\n\n  for await (const page of result) {\n    // Handle the page\n    console.log(page);\n  }\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -11352,8 +12106,13 @@
           "featured"
         ],
         "summary": "Get Subscription",
-        "description": "Get a subscription for the authenticated customer or user.",
+        "description": "Get a subscription for the authenticated customer.\n\n**Scopes**: `customer_portal:read` `customer_portal:write`",
         "operationId": "customer_portal:subscriptions:get",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -11401,26 +12160,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.subscriptions",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Subscriptions.Get(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Subscriptions.Get(ctx, operations.CustomerPortalSubscriptionsGetSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.subscriptions.get(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.subscriptions.get(security=polar_sdk.CustomerPortalSubscriptionsGetSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.get({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.get({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -11437,8 +12198,13 @@
           "featured"
         ],
         "summary": "Update Subscription",
-        "description": "Update a subscription of the authenticated customer or user.",
+        "description": "Update a subscription of the authenticated customer.\n\n**Scopes**: `customer_portal:write`",
         "operationId": "customer_portal:subscriptions:update",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -11506,26 +12272,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.subscriptions",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Subscriptions.Update(ctx, \"\u003cvalue\u003e\", components.CreateCustomerSubscriptionUpdateCustomerSubscriptionCancel(\n        components.CustomerSubscriptionCancel{},\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"github.com/polarsource/polar-go/models/components\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Subscriptions.Update(ctx, operations.CustomerPortalSubscriptionsUpdateSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\", components.CreateCustomerSubscriptionUpdateCustomerSubscriptionCancel(\n        components.CustomerSubscriptionCancel{},\n    ))\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.subscriptions.update(id=\"\u003cvalue\u003e\", customer_subscription_update={})\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.subscriptions.update(security=polar_sdk.CustomerPortalSubscriptionsUpdateSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\", customer_subscription_update={})\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.update({\n    id: \"\u003cvalue\u003e\",\n    customerSubscriptionUpdate: {},\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.update({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n    customerSubscriptionUpdate: {},\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -11542,8 +12310,13 @@
           "featured"
         ],
         "summary": "Cancel Subscription",
-        "description": "Cancel a subscription of the authenticated customer or user.",
+        "description": "Cancel a subscription of the authenticated customer.\n\n**Scopes**: `customer_portal:write`",
         "operationId": "customer_portal:subscriptions:cancel",
+        "security": [
+          {
+            "customer_session": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -11601,26 +12374,28 @@
           }
         },
         "x-polar-allowed-subjects": [
-          "Customer",
-          "User"
+          "Customer"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer_portal.subscriptions",
         "x-speakeasy-name-override": "cancel",
         "x-codeSamples": [
           {
             "lang": "go",
             "label": "Go (SDK)",
-            "source": "package main\n\nimport(\n\t\"context\"\n\t\"os\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New(\n        polargo.WithSecurity(os.Getenv(\"POLAR_ACCESS_TOKEN\")),\n    )\n\n    res, err := s.CustomerPortal.Subscriptions.Cancel(ctx, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
+            "source": "package main\n\nimport(\n\t\"context\"\n\tpolargo \"github.com/polarsource/polar-go\"\n\t\"os\"\n\t\"github.com/polarsource/polar-go/models/operations\"\n\t\"log\"\n)\n\nfunc main() {\n    ctx := context.Background()\n    \n    s := polargo.New()\n\n    res, err := s.CustomerPortal.Subscriptions.Cancel(ctx, operations.CustomerPortalSubscriptionsCancelSecurity{\n        CustomerSession: os.Getenv(\"POLAR_CUSTOMER_SESSION\"),\n    }, \"\u003cvalue\u003e\")\n    if err != nil {\n        log.Fatal(err)\n    }\n    if res.CustomerSubscription != nil {\n        // handle response\n    }\n}"
           },
           {
             "lang": "python",
             "label": "Python (SDK)",
-            "source": "from polar_sdk import Polar\n\nwith Polar(\n    access_token=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n) as polar:\n\n    res = polar.customer_portal.subscriptions.cancel(id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
+            "source": "import polar_sdk\nfrom polar_sdk import Polar\n\nwith Polar() as polar:\n\n    res = polar.customer_portal.subscriptions.cancel(security=polar_sdk.CustomerPortalSubscriptionsCancelSecurity(\n        customer_session=\"\u003cYOUR_BEARER_TOKEN_HERE\u003e\",\n    ), id=\"\u003cvalue\u003e\")\n\n    # Handle response\n    print(res)"
           },
           {
             "lang": "typescript",
             "label": "Typescript (SDK)",
-            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar({\n  accessToken: process.env[\"POLAR_ACCESS_TOKEN\"] ?? \"\",\n});\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.cancel({\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
+            "source": "import { Polar } from \"@polar-sh/sdk\";\n\nconst polar = new Polar();\n\nasync function run() {\n  const result = await polar.customerPortal.subscriptions.cancel({\n    customerSession: process.env[\"POLAR_CUSTOMER_SESSION\"] ?? \"\",\n  }, {\n    id: \"\u003cvalue\u003e\",\n  });\n\n  // Handle the result\n  console.log(result);\n}\n\nrun();"
           },
           {
             "lang": "php",
@@ -11638,7 +12413,7 @@
           "featured"
         ],
         "summary": "Create Customer Session",
-        "description": "Create a customer session.",
+        "description": "Create a customer session.\n\n**Scopes**: `customer_sessions:write`",
         "operationId": "customer-sessions:create",
         "requestBody": {
           "content": {
@@ -11676,6 +12451,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "customer-sessions",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -11710,7 +12488,7 @@
           "featured"
         ],
         "summary": "List Events",
-        "description": "List events.",
+        "description": "List events.\n\n**Scopes**: `events:read` `events:write`",
         "operationId": "events:list",
         "parameters": [
           {
@@ -11971,6 +12749,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "events",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -12005,7 +12786,7 @@
           "featured"
         ],
         "summary": "Get Event",
-        "description": "Get an event by ID.",
+        "description": "Get an event by ID.\n\n**Scopes**: `events:read` `events:write`",
         "operationId": "events:get",
         "parameters": [
           {
@@ -12057,6 +12838,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "events",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -12091,7 +12875,7 @@
           "featured"
         ],
         "summary": "Ingest Events",
-        "description": "Ingest batch of events.",
+        "description": "Ingest batch of events.\n\n**Scopes**: `events:write`",
         "operationId": "events:ingest",
         "requestBody": {
           "content": {
@@ -12129,6 +12913,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "events",
         "x-speakeasy-name-override": "ingest",
         "x-codeSamples": [
@@ -12163,7 +12950,7 @@
           "featured"
         ],
         "summary": "List Meters",
-        "description": "List meters.",
+        "description": "List meters.\n\n**Scopes**: `meters:read` `meters:write`",
         "operationId": "meters:list",
         "parameters": [
           {
@@ -12328,6 +13115,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "list",
         "x-codeSamples": [
@@ -12360,7 +13150,7 @@
           "featured"
         ],
         "summary": "Create Meter",
-        "description": "Create a meter.",
+        "description": "Create a meter.\n\n**Scopes**: `meters:write`",
         "operationId": "meters:create",
         "requestBody": {
           "required": true,
@@ -12398,6 +13188,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "create",
         "x-codeSamples": [
@@ -12432,7 +13225,7 @@
           "featured"
         ],
         "summary": "Get Meter",
-        "description": "Get a meter by ID.",
+        "description": "Get a meter by ID.\n\n**Scopes**: `meters:read` `meters:write`",
         "operationId": "meters:get",
         "parameters": [
           {
@@ -12484,6 +13277,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "get",
         "x-codeSamples": [
@@ -12516,7 +13312,7 @@
           "featured"
         ],
         "summary": "Update Meter",
-        "description": "Update a meter.",
+        "description": "Update a meter.\n\n**Scopes**: `meters:write`",
         "operationId": "meters:update",
         "parameters": [
           {
@@ -12578,6 +13374,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "update",
         "x-codeSamples": [
@@ -12612,7 +13411,7 @@
           "featured"
         ],
         "summary": "Get Meter Events",
-        "description": "Get events matching the filter of a meter.",
+        "description": "Get events matching the filter of a meter.\n\n**Scopes**: `meters:read` `meters:write`",
         "operationId": "meters:events",
         "parameters": [
           {
@@ -12709,6 +13508,9 @@
             "numPages": "$.pagination.max_page"
           }
         },
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "events",
         "x-codeSamples": [
@@ -12743,7 +13545,7 @@
           "featured"
         ],
         "summary": "Get Meter Quantities",
-        "description": "Get quantities of a meter over a time period.",
+        "description": "Get quantities of a meter over a time period.\n\n**Scopes**: `meters:read` `meters:write`",
         "operationId": "meters:quantities",
         "parameters": [
           {
@@ -12881,6 +13683,9 @@
           "Organization",
           "User"
         ],
+        "x-speakeasy-mcp": {
+          "disabled": true
+        },
         "x-speakeasy-group": "meters",
         "x-speakeasy-name-override": "quantities",
         "x-codeSamples": [
@@ -23504,6 +24309,29 @@
         "title": "CustomerOrganization",
         "description": "Schema of an organization and related data for customer portal."
       },
+      "CustomerPaymentMethodCreate": {
+        "properties": {
+          "confirmation_token_id": {
+            "type": "string",
+            "title": "Confirmation Token Id"
+          },
+          "set_default": {
+            "type": "boolean",
+            "title": "Set Default"
+          },
+          "return_url": {
+            "type": "string",
+            "title": "Return Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "confirmation_token_id",
+          "set_default",
+          "return_url"
+        ],
+        "title": "CustomerPaymentMethodCreate"
+      },
       "CustomerPortalCustomer": {
         "properties": {
           "created_at": {
@@ -23602,6 +24430,56 @@
           "oauth_accounts"
         ],
         "title": "CustomerPortalCustomer"
+      },
+      "CustomerPortalCustomerUpdate": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "billing_address": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tax_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Id"
+          }
+        },
+        "type": "object",
+        "title": "CustomerPortalCustomerUpdate"
       },
       "CustomerPortalOAuthAccount": {
         "properties": {
@@ -29521,6 +30399,33 @@
         ],
         "title": "ListResource[Subscription]"
       },
+      "ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__": {
+        "properties": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/PaymentMethodCard"
+                },
+                {
+                  "$ref": "#/components/schemas/PaymentMethodGeneric"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "ListResource[Union[PaymentMethodCard, PaymentMethodGeneric]]"
+      },
       "Meter": {
         "properties": {
           "metadata": {
@@ -32216,6 +33121,108 @@
           "detail"
         ],
         "title": "PaymentError"
+      },
+      "PaymentMethodCard": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "const": "card",
+            "title": "Type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "default": {
+            "type": "boolean",
+            "title": "Default"
+          },
+          "card": {
+            "$ref": "#/components/schemas/PaymentMethodCardData"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "default",
+          "card"
+        ],
+        "title": "PaymentMethodCard"
+      },
+      "PaymentMethodCardData": {
+        "properties": {
+          "brand": {
+            "type": "string",
+            "title": "Brand"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "exp_month": {
+            "type": "integer",
+            "title": "Exp Month"
+          },
+          "exp_year": {
+            "type": "integer",
+            "title": "Exp Year"
+          },
+          "wallet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wallet"
+          }
+        },
+        "type": "object",
+        "required": [
+          "brand",
+          "last4",
+          "exp_month",
+          "exp_year"
+        ],
+        "title": "PaymentMethodCardData"
+      },
+      "PaymentMethodGeneric": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "default": {
+            "type": "boolean",
+            "title": "Default"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "default"
+        ],
+        "title": "PaymentMethodGeneric"
       },
       "PaymentProcessor": {
         "type": "string",
@@ -36120,16 +37127,18 @@
       },
       "oat": {
         "type": "http",
-        "description": "You can generate an **Organization Access Token** from your organization's dashboard.",
+        "description": "You can generate an **Organization Access Token** from your organization's settings.",
         "scheme": "bearer"
       },
       "customer_session": {
         "type": "http",
+        "description": "Customer session tokens are specific tokens that are used to authenticate customers on your organization. You can create those sessions programmatically using the [Create Customer Session endpoint](/api-reference/customer-portal/sessions/create).",
         "scheme": "bearer"
       },
       "access_token": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "description": "You can generate an **Organization Access Token** from your organization's settings."
       }
     }
   },
@@ -36145,6 +37154,10 @@
     {
       "name": "featured",
       "description": "Endpoints featured in the Polar API documentation for their interest in common use-cases."
+    },
+    {
+      "name": "mcp",
+      "description": "Endpoints enabled in the MCP server."
     },
     {
       "name": "issue_funding",
