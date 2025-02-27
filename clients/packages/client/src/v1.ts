@@ -663,6 +663,8 @@ export interface paths {
         /**
          * List External Organizations
          * @description List external organizations.
+         *
+         *     **Scopes**: `external_organizations:read`
          */
         get: operations["external_organizations:list"];
         put?: never;
@@ -683,6 +685,8 @@ export interface paths {
         /**
          * List Repositories
          * @description List repositories.
+         *
+         *     **Scopes**: `repositories:read` `repositories:write`
          */
         get: operations["repositories:list"];
         put?: never;
@@ -703,6 +707,8 @@ export interface paths {
         /**
          * Get Repository
          * @description Get a repository by ID.
+         *
+         *     **Scopes**: `repositories:read` `repositories:write`
          */
         get: operations["repositories:get"];
         put?: never;
@@ -713,6 +719,8 @@ export interface paths {
         /**
          * Update Repository
          * @description Update a repository.
+         *
+         *     **Scopes**: `repositories:write`
          */
         patch: operations["repositories:update"];
         trace?: never;
@@ -789,40 +797,6 @@ export interface paths {
         post?: never;
         /** Delete Personal Access Token */
         delete: operations["personal_access_token:delete_personal_access_token"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/payment_methods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List */
-        get: operations["payment_methods:list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/payment_methods/{id}/detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Detach */
-        post: operations["payment_methods:detach"];
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -923,6 +897,8 @@ export interface paths {
         /**
          * List Issues
          * @description List issues.
+         *
+         *     **Scopes**: `issues:read` `issues:write`
          */
         get: operations["issues:list"];
         put?: never;
@@ -1297,12 +1273,16 @@ export interface paths {
         /**
          * List Organizations
          * @description List organizations.
+         *
+         *     **Scopes**: `organizations:read` `organizations:write`
          */
         get: operations["organizations:list"];
         put?: never;
         /**
          * Create Organization
          * @description Create an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         post: operations["organizations:create"];
         delete?: never;
@@ -1321,6 +1301,8 @@ export interface paths {
         /**
          * Get Organization
          * @description Get an organization by ID.
+         *
+         *     **Scopes**: `organizations:read` `organizations:write`
          */
         get: operations["organizations:get"];
         put?: never;
@@ -1331,6 +1313,8 @@ export interface paths {
         /**
          * Update Organization
          * @description Update an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         patch: operations["organizations:update"];
         trace?: never;
@@ -1345,6 +1329,8 @@ export interface paths {
         /**
          * Get Organization Account
          * @description Get the account for an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         get: operations["organizations:get_account"];
         put?: never;
@@ -1355,6 +1341,8 @@ export interface paths {
         /**
          * Set Organization Account
          * @description Set the account for an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         patch: operations["organizations:set_account"];
         trace?: never;
@@ -1369,6 +1357,8 @@ export interface paths {
         /**
          * Members
          * @description List members in an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         get: operations["organizations:members"];
         put?: never;
@@ -1391,6 +1381,8 @@ export interface paths {
         /**
          * Create Stripe Customer Portal
          * @description Create a new Stripe Customer session for a organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         post: operations["organizations:create_stripe_customer_portal"];
         delete?: never;
@@ -1409,12 +1401,16 @@ export interface paths {
         /**
          * Get Badge Settings
          * @description Get badge settings for an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         get: operations["organizations:get_badge_settings"];
         put?: never;
         /**
          * Update Badge Settings
          * @description Update badge settings for an organization.
+         *
+         *     **Scopes**: `organizations:write`
          */
         post: operations["organizations:update_badge_settings"];
         delete?: never;
@@ -1433,6 +1429,8 @@ export interface paths {
         /**
          * List Subscriptions
          * @description List subscriptions.
+         *
+         *     **Scopes**: `subscriptions:read` `subscriptions:write`
          */
         get: operations["subscriptions:list"];
         put?: never;
@@ -1453,6 +1451,8 @@ export interface paths {
         /**
          * Export Subscriptions
          * @description Export subscriptions as a CSV file.
+         *
+         *     **Scopes**: `subscriptions:read` `subscriptions:write`
          */
         get: operations["subscriptions:export"];
         put?: never;
@@ -1473,6 +1473,8 @@ export interface paths {
         /**
          * Get Subscription
          * @description Get a subscription by ID.
+         *
+         *     **Scopes**: `subscriptions:write`
          */
         get: operations["subscriptions:get"];
         put?: never;
@@ -1480,6 +1482,8 @@ export interface paths {
         /**
          * Revoke Subscription
          * @description Revoke a subscription, i.e cancel immediately.
+         *
+         *     **Scopes**: `subscriptions:write`
          */
         delete: operations["subscriptions:revoke"];
         options?: never;
@@ -1487,6 +1491,8 @@ export interface paths {
         /**
          * Update Subscription
          * @description Update a subscription.
+         *
+         *     **Scopes**: `subscriptions:write`
          */
         patch: operations["subscriptions:update"];
         trace?: never;
@@ -1846,12 +1852,16 @@ export interface paths {
         /**
          * List Benefits
          * @description List benefits.
+         *
+         *     **Scopes**: `benefits:read` `benefits:write`
          */
         get: operations["benefits:list"];
         put?: never;
         /**
          * Create Benefit
          * @description Create a benefit.
+         *
+         *     **Scopes**: `benefits:write`
          */
         post: operations["benefits:create"];
         delete?: never;
@@ -1870,6 +1880,8 @@ export interface paths {
         /**
          * Get Benefit
          * @description Get a benefit by ID.
+         *
+         *     **Scopes**: `benefits:read` `benefits:write`
          */
         get: operations["benefits:get"];
         put?: never;
@@ -1881,6 +1893,8 @@ export interface paths {
          *     > [!WARNING]
          *     > Every grants associated with the benefit will be revoked.
          *     > Users will lose access to the benefit.
+         *
+         *     **Scopes**: `benefits:write`
          */
         delete: operations["benefits:delete"];
         options?: never;
@@ -1888,6 +1902,8 @@ export interface paths {
         /**
          * Update Benefit
          * @description Update a benefit.
+         *
+         *     **Scopes**: `benefits:write`
          */
         patch: operations["benefits:update"];
         trace?: never;
@@ -1904,6 +1920,8 @@ export interface paths {
          * @description List the individual grants for a benefit.
          *
          *     It's especially useful to check if a user has been granted a benefit.
+         *
+         *     **Scopes**: `benefits:read` `benefits:write`
          */
         get: operations["benefits:grants"];
         put?: never;
@@ -1924,12 +1942,16 @@ export interface paths {
         /**
          * List Webhook Endpoints
          * @description List webhook endpoints.
+         *
+         *     **Scopes**: `webhooks:read` `webhooks:write`
          */
         get: operations["webhooks:list_webhook_endpoints"];
         put?: never;
         /**
          * Create Webhook Endpoint
          * @description Create a webhook endpoint.
+         *
+         *     **Scopes**: `webhooks:write`
          */
         post: operations["webhooks:create_webhook_endpoint"];
         delete?: never;
@@ -1948,6 +1970,8 @@ export interface paths {
         /**
          * Get Webhook Endpoint
          * @description Get a webhook endpoint by ID.
+         *
+         *     **Scopes**: `webhooks:read` `webhooks:write`
          */
         get: operations["webhooks:get_webhook_endpoint"];
         put?: never;
@@ -1955,6 +1979,8 @@ export interface paths {
         /**
          * Delete Webhook Endpoint
          * @description Delete a webhook endpoint.
+         *
+         *     **Scopes**: `webhooks:write`
          */
         delete: operations["webhooks:delete_webhook_endpoint"];
         options?: never;
@@ -1962,6 +1988,8 @@ export interface paths {
         /**
          * Update Webhook Endpoint
          * @description Update a webhook endpoint.
+         *
+         *     **Scopes**: `webhooks:write`
          */
         patch: operations["webhooks:update_webhook_endpoint"];
         trace?: never;
@@ -1978,6 +2006,8 @@ export interface paths {
          * @description List webhook deliveries.
          *
          *     Deliveries are all the attempts to deliver a webhook event to an endpoint.
+         *
+         *     **Scopes**: `webhooks:read` `webhooks:write`
          */
         get: operations["webhooks:list_webhook_deliveries"];
         put?: never;
@@ -2000,6 +2030,8 @@ export interface paths {
         /**
          * Redeliver Webhook Event
          * @description Schedule the re-delivery of a webhook event.
+         *
+         *     **Scopes**: `webhooks:write`
          */
         post: operations["webhooks:redeliver_webhook_event"];
         delete?: never;
@@ -2018,12 +2050,16 @@ export interface paths {
         /**
          * List Products
          * @description List products.
+         *
+         *     **Scopes**: `products:read` `products:write`
          */
         get: operations["products:list"];
         put?: never;
         /**
          * Create Product
          * @description Create a product.
+         *
+         *     **Scopes**: `products:write`
          */
         post: operations["products:create"];
         delete?: never;
@@ -2042,6 +2078,8 @@ export interface paths {
         /**
          * Get Product
          * @description Get a product by ID.
+         *
+         *     **Scopes**: `products:read` `products:write`
          */
         get: operations["products:get"];
         put?: never;
@@ -2052,6 +2090,8 @@ export interface paths {
         /**
          * Update Product
          * @description Update a product.
+         *
+         *     **Scopes**: `products:write`
          */
         patch: operations["products:update"];
         trace?: never;
@@ -2068,6 +2108,8 @@ export interface paths {
         /**
          * Update Product Benefits
          * @description Update benefits granted by a product.
+         *
+         *     **Scopes**: `products:write`
          */
         post: operations["products:update_benefits"];
         delete?: never;
@@ -2086,6 +2128,8 @@ export interface paths {
         /**
          * List Orders
          * @description List orders.
+         *
+         *     **Scopes**: `orders:read`
          */
         get: operations["orders:list"];
         put?: never;
@@ -2106,6 +2150,8 @@ export interface paths {
         /**
          * Get Order
          * @description Get an order by ID.
+         *
+         *     **Scopes**: `orders:read`
          */
         get: operations["orders:get"];
         put?: never;
@@ -2126,6 +2172,8 @@ export interface paths {
         /**
          * Get Order Invoice
          * @description Get an order's invoice data.
+         *
+         *     **Scopes**: `orders:read`
          */
         get: operations["orders:invoice"];
         put?: never;
@@ -2146,12 +2194,16 @@ export interface paths {
         /**
          * List Refunds
          * @description List products.
+         *
+         *     **Scopes**: `refunds:read` `refunds:write`
          */
         get: operations["refunds:list"];
         put?: never;
         /**
          * Create Refund
          * @description Create a refund.
+         *
+         *     **Scopes**: `refunds:write`
          */
         post: operations["refunds:create"];
         delete?: never;
@@ -2170,12 +2222,16 @@ export interface paths {
         /**
          * List Checkout Sessions
          * @description List checkout sessions.
+         *
+         *     **Scopes**: `checkouts:read` `checkouts:write`
          */
         get: operations["checkouts:list"];
         put?: never;
         /**
          * Create Checkout Session
          * @description Create a checkout session.
+         *
+         *     **Scopes**: `checkouts:write`
          */
         post: operations["checkouts:create"];
         delete?: never;
@@ -2194,6 +2250,8 @@ export interface paths {
         /**
          * Get Checkout Session
          * @description Get a checkout session by ID.
+         *
+         *     **Scopes**: `checkouts:read` `checkouts:write`
          */
         get: operations["checkouts:get"];
         put?: never;
@@ -2204,6 +2262,8 @@ export interface paths {
         /**
          * Update Checkout Session
          * @description Update a checkout session.
+         *
+         *     **Scopes**: `checkouts:write`
          */
         patch: operations["checkouts:update"];
         trace?: never;
@@ -2284,12 +2344,16 @@ export interface paths {
         /**
          * List Files
          * @description List files.
+         *
+         *     **Scopes**: `files:write`
          */
         get: operations["files:list"];
         put?: never;
         /**
          * Create File
          * @description Create a file.
+         *
+         *     **Scopes**: `files:write`
          */
         post: operations["files:create"];
         delete?: never;
@@ -2310,6 +2374,8 @@ export interface paths {
         /**
          * Complete File Upload
          * @description Complete a file upload.
+         *
+         *     **Scopes**: `files:write`
          */
         post: operations["files:uploaded"];
         delete?: never;
@@ -2331,6 +2397,8 @@ export interface paths {
         /**
          * Delete File
          * @description Delete a file.
+         *
+         *     **Scopes**: `files:write`
          */
         delete: operations["files:delete"];
         options?: never;
@@ -2338,6 +2406,8 @@ export interface paths {
         /**
          * Update File
          * @description Update a file.
+         *
+         *     **Scopes**: `files:write`
          */
         patch: operations["files:update"];
         trace?: never;
@@ -2352,6 +2422,10 @@ export interface paths {
         /**
          * Get Metrics
          * @description Get metrics about your orders and subscriptions.
+         *
+         *     Currency values are output in cents.
+         *
+         *     **Scopes**: `metrics:read`
          */
         get: operations["metrics:get"];
         put?: never;
@@ -2372,6 +2446,8 @@ export interface paths {
         /**
          * Get Metrics Limits
          * @description Get the interval limits for the metrics endpoint.
+         *
+         *     **Scopes**: `metrics:read`
          */
         get: operations["metrics:limits"];
         put?: never;
@@ -2426,6 +2502,8 @@ export interface paths {
         /**
          * List License Keys
          * @description Get license keys connected to the given organization & filters.
+         *
+         *     **Scopes**: `license_keys:read` `license_keys:write`
          */
         get: operations["license_keys:list"];
         put?: never;
@@ -2446,6 +2524,8 @@ export interface paths {
         /**
          * Get License Key
          * @description Get a license key.
+         *
+         *     **Scopes**: `license_keys:read` `license_keys:write`
          */
         get: operations["license_keys:get"];
         put?: never;
@@ -2456,6 +2536,8 @@ export interface paths {
         /**
          * Update License Key
          * @description Update a license key.
+         *
+         *     **Scopes**: `license_keys:write`
          */
         patch: operations["license_keys:update"];
         trace?: never;
@@ -2470,6 +2552,8 @@ export interface paths {
         /**
          * Get Activation
          * @description Get a license key activation.
+         *
+         *     **Scopes**: `license_keys:read` `license_keys:write`
          */
         get: operations["license_keys:get_activation"];
         put?: never;
@@ -2490,12 +2574,16 @@ export interface paths {
         /**
          * List Checkout Links
          * @description List checkout links.
+         *
+         *     **Scopes**: `checkout_links:read` `checkout_links:write`
          */
         get: operations["checkout-links:list"];
         put?: never;
         /**
          * Create Checkout Link
          * @description Create a checkout link.
+         *
+         *     **Scopes**: `checkout_links:write`
          */
         post: operations["checkout-links:create"];
         delete?: never;
@@ -2514,6 +2602,8 @@ export interface paths {
         /**
          * Get Checkout Link
          * @description Get a checkout link by ID.
+         *
+         *     **Scopes**: `checkout_links:read` `checkout_links:write`
          */
         get: operations["checkout-links:get"];
         put?: never;
@@ -2521,6 +2611,8 @@ export interface paths {
         /**
          * Delete Checkout Link
          * @description Delete a checkout link.
+         *
+         *     **Scopes**: `checkout_links:write`
          */
         delete: operations["checkout-links:delete"];
         options?: never;
@@ -2528,6 +2620,8 @@ export interface paths {
         /**
          * Update Checkout Link
          * @description Update a checkout link.
+         *
+         *     **Scopes**: `checkout_links:write`
          */
         patch: operations["checkout-links:update"];
         trace?: never;
@@ -2562,12 +2656,16 @@ export interface paths {
         /**
          * List Custom Fields
          * @description List custom fields.
+         *
+         *     **Scopes**: `custom_fields:read` `custom_fields:write`
          */
         get: operations["custom-fields:list"];
         put?: never;
         /**
          * Create Custom Field
          * @description Create a custom field.
+         *
+         *     **Scopes**: `custom_fields:write`
          */
         post: operations["custom-fields:create"];
         delete?: never;
@@ -2586,6 +2684,8 @@ export interface paths {
         /**
          * Get Custom Field
          * @description Get a custom field by ID.
+         *
+         *     **Scopes**: `custom_fields:read` `custom_fields:write`
          */
         get: operations["custom-fields:get"];
         put?: never;
@@ -2593,6 +2693,8 @@ export interface paths {
         /**
          * Delete Custom Field
          * @description Delete a custom field.
+         *
+         *     **Scopes**: `custom_fields:write`
          */
         delete: operations["custom-fields:delete"];
         options?: never;
@@ -2600,6 +2702,8 @@ export interface paths {
         /**
          * Update Custom Field
          * @description Update a custom field.
+         *
+         *     **Scopes**: `custom_fields:write`
          */
         patch: operations["custom-fields:update"];
         trace?: never;
@@ -2634,12 +2738,16 @@ export interface paths {
         /**
          * List Discounts
          * @description List discounts.
+         *
+         *     **Scopes**: `discounts:read` `discounts:write`
          */
         get: operations["discounts:list"];
         put?: never;
         /**
          * Create Discount
          * @description Create a discount.
+         *
+         *     **Scopes**: `discounts:write`
          */
         post: operations["discounts:create"];
         delete?: never;
@@ -2658,6 +2766,8 @@ export interface paths {
         /**
          * Get Discount
          * @description Get a discount by ID.
+         *
+         *     **Scopes**: `discounts:read` `discounts:write`
          */
         get: operations["discounts:get"];
         put?: never;
@@ -2665,6 +2775,8 @@ export interface paths {
         /**
          * Delete Discount
          * @description Delete a discount.
+         *
+         *     **Scopes**: `discounts:write`
          */
         delete: operations["discounts:delete"];
         options?: never;
@@ -2672,6 +2784,8 @@ export interface paths {
         /**
          * Update Discount
          * @description Update a discount.
+         *
+         *     **Scopes**: `discounts:write`
          */
         patch: operations["discounts:update"];
         trace?: never;
@@ -2686,12 +2800,16 @@ export interface paths {
         /**
          * List Customers
          * @description List customers.
+         *
+         *     **Scopes**: `customers:read` `customers:write`
          */
         get: operations["customers:list"];
         put?: never;
         /**
          * Create Customer
          * @description Create a customer.
+         *
+         *     **Scopes**: `customers:write`
          */
         post: operations["customers:create"];
         delete?: never;
@@ -2710,6 +2828,8 @@ export interface paths {
         /**
          * Get Customer
          * @description Get a customer by ID.
+         *
+         *     **Scopes**: `customers:read` `customers:write`
          */
         get: operations["customers:get"];
         put?: never;
@@ -2719,6 +2839,8 @@ export interface paths {
          * @description Delete a customer.
          *
          *     Immediately cancels any active subscriptions and revokes any active benefits.
+         *
+         *     **Scopes**: `customers:write`
          */
         delete: operations["customers:delete"];
         options?: never;
@@ -2726,8 +2848,46 @@ export interface paths {
         /**
          * Update Customer
          * @description Update a customer.
+         *
+         *     **Scopes**: `customers:write`
          */
         patch: operations["customers:update"];
+        trace?: never;
+    };
+    "/v1/customers/external/{external_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Customer by External ID
+         * @description Get a customer by external ID.
+         *
+         *     **Scopes**: `customers:read` `customers:write`
+         */
+        get: operations["customers:get_external"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Customer by External ID
+         * @description Delete a customer by external ID.
+         *
+         *     Immediately cancels any active subscriptions and revokes any active benefits.
+         *
+         *     **Scopes**: `customers:write`
+         */
+        delete: operations["customers:delete_external"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Customer by External ID
+         * @description Update a customer by external ID.
+         *
+         *     **Scopes**: `customers:write`
+         */
+        patch: operations["customers:update_external"];
         trace?: never;
     };
     "/v1/customer-portal/benefit-grants/": {
@@ -2739,7 +2899,9 @@ export interface paths {
         };
         /**
          * List Benefit Grants
-         * @description List benefits grants of the authenticated customer or user.
+         * @description List benefits grants of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:benefit-grants:list"];
         put?: never;
@@ -2759,7 +2921,9 @@ export interface paths {
         };
         /**
          * Get Benefit Grant
-         * @description Get a benefit grant by ID for the authenticated customer or user.
+         * @description Get a benefit grant by ID for the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:benefit-grants:get"];
         put?: never;
@@ -2769,12 +2933,14 @@ export interface paths {
         head?: never;
         /**
          * Update Benefit Grant
-         * @description Update a benefit grant for the authenticated customer or user.
+         * @description Update a benefit grant for the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:write`
          */
         patch: operations["customer_portal:benefit-grants:update"];
         trace?: never;
     };
-    "/v1/customer-portal/customers/{id}": {
+    "/v1/customer-portal/customers/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -2783,12 +2949,70 @@ export interface paths {
         };
         /**
          * Get Customer
-         * @description Get a customer by ID for the authenticated customer or user.
+         * @description Get authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:customers:get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Customer
+         * @description Update authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:write`
+         */
+        patch: operations["customer_portal:customers:update"];
+        trace?: never;
+    };
+    "/v1/customer-portal/customers/me/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Customer Payment Methods
+         * @description Get saved payment methods of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
+         */
+        get: operations["customer_portal:customers:get_payment_methods"];
+        put?: never;
+        /**
+         * Add Customer Payment Method
+         * @description Add a payment method to the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
+         */
+        post: operations["customer_portal:customers:add_payment_method"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/customer-portal/customers/me/payment-methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Customer Payment Method
+         * @description Delete a payment method from the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
+         */
+        delete: operations["customer_portal:customers:delete_payment_method"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2835,7 +3059,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Downloadables */
+        /**
+         * List Downloadables
+         * @description **Scopes**: `customer_portal:read` `customer_portal:write`
+         */
         get: operations["customer_portal:downloadables:list"];
         put?: never;
         post?: never;
@@ -2869,7 +3096,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List License Keys */
+        /**
+         * List License Keys
+         * @description **Scopes**: `customer_portal:read` `customer_portal:write`
+         */
         get: operations["customer_portal:license_keys:list"];
         put?: never;
         post?: never;
@@ -2889,6 +3119,8 @@ export interface paths {
         /**
          * Get License Key
          * @description Get a license key.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:license_keys:get"];
         put?: never;
@@ -2966,7 +3198,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Customer Portal.Oauth Accounts.Authorize */
+        /**
+         * Customer Portal.Oauth Accounts.Authorize
+         * @description **Scopes**: `customer_portal:write`
+         */
         get: operations["customer_portal:oauth-accounts:customer_portal.oauth_accounts.authorize"];
         put?: never;
         post?: never;
@@ -2983,7 +3218,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Customer Portal.Oauth Accounts.Callback */
+        /**
+         * Customer Portal.Oauth Accounts.Callback
+         * @description **Scopes**: `customer_portal:write`
+         */
         get: operations["customer_portal:oauth-accounts:customer_portal.oauth_accounts.callback"];
         put?: never;
         post?: never;
@@ -3002,7 +3240,9 @@ export interface paths {
         };
         /**
          * List Orders
-         * @description List orders of the authenticated customer or user.
+         * @description List orders of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:orders:list"];
         put?: never;
@@ -3022,7 +3262,9 @@ export interface paths {
         };
         /**
          * Get Order
-         * @description Get an order by ID for the authenticated customer or user.
+         * @description Get an order by ID for the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:orders:get"];
         put?: never;
@@ -3043,6 +3285,8 @@ export interface paths {
         /**
          * Get Order Invoice
          * @description Get an order's invoice data.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:orders:invoice"];
         put?: never;
@@ -3082,7 +3326,9 @@ export interface paths {
         };
         /**
          * List Subscriptions
-         * @description List subscriptions of the authenticated customer or user.
+         * @description List subscriptions of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:subscriptions:list"];
         put?: never;
@@ -3102,21 +3348,27 @@ export interface paths {
         };
         /**
          * Get Subscription
-         * @description Get a subscription for the authenticated customer or user.
+         * @description Get a subscription for the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:read` `customer_portal:write`
          */
         get: operations["customer_portal:subscriptions:get"];
         put?: never;
         post?: never;
         /**
          * Cancel Subscription
-         * @description Cancel a subscription of the authenticated customer or user.
+         * @description Cancel a subscription of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:write`
          */
         delete: operations["customer_portal:subscriptions:cancel"];
         options?: never;
         head?: never;
         /**
          * Update Subscription
-         * @description Update a subscription of the authenticated customer or user.
+         * @description Update a subscription of the authenticated customer.
+         *
+         *     **Scopes**: `customer_portal:write`
          */
         patch: operations["customer_portal:subscriptions:update"];
         trace?: never;
@@ -3167,6 +3419,8 @@ export interface paths {
         /**
          * Create Customer Session
          * @description Create a customer session.
+         *
+         *     **Scopes**: `customer_sessions:write`
          */
         post: operations["customer-sessions:create"];
         delete?: never;
@@ -3185,6 +3439,8 @@ export interface paths {
         /**
          * List Events
          * @description List events.
+         *
+         *     **Scopes**: `events:read` `events:write`
          */
         get: operations["events:list"];
         put?: never;
@@ -3205,6 +3461,8 @@ export interface paths {
         /**
          * Get Event
          * @description Get an event by ID.
+         *
+         *     **Scopes**: `events:read` `events:write`
          */
         get: operations["events:get"];
         put?: never;
@@ -3227,6 +3485,8 @@ export interface paths {
         /**
          * Ingest Events
          * @description Ingest batch of events.
+         *
+         *     **Scopes**: `events:write`
          */
         post: operations["events:ingest"];
         delete?: never;
@@ -3245,12 +3505,16 @@ export interface paths {
         /**
          * List Meters
          * @description List meters.
+         *
+         *     **Scopes**: `meters:read` `meters:write`
          */
         get: operations["meters:list"];
         put?: never;
         /**
          * Create Meter
          * @description Create a meter.
+         *
+         *     **Scopes**: `meters:write`
          */
         post: operations["meters:create"];
         delete?: never;
@@ -3269,6 +3533,8 @@ export interface paths {
         /**
          * Get Meter
          * @description Get a meter by ID.
+         *
+         *     **Scopes**: `meters:read` `meters:write`
          */
         get: operations["meters:get"];
         put?: never;
@@ -3279,6 +3545,8 @@ export interface paths {
         /**
          * Update Meter
          * @description Update a meter.
+         *
+         *     **Scopes**: `meters:write`
          */
         patch: operations["meters:update"];
         trace?: never;
@@ -3293,6 +3561,8 @@ export interface paths {
         /**
          * Get Meter Events
          * @description Get events matching the filter of a meter.
+         *
+         *     **Scopes**: `meters:read` `meters:write`
          */
         get: operations["meters:events"];
         put?: never;
@@ -3313,6 +3583,8 @@ export interface paths {
         /**
          * Get Meter Quantities
          * @description Get quantities of a meter over a time period.
+         *
+         *     **Scopes**: `meters:read` `meters:write`
          */
         get: operations["meters:quantities"];
         put?: never;
@@ -6514,6 +6786,11 @@ export interface components {
              * @description ID of an existing customer in the organization. The customer data will be pre-filled in the checkout form. The resulting order will be linked to this customer.
              */
             customer_id?: string | null;
+            /**
+             * Customer External Id
+             * @description ID of the customer in your system. If a matching customer exists on Polar, the resulting order will be linked to this customer. Otherwise, a new customer will be created with this external ID set.
+             */
+            customer_external_id?: string | null;
             /** Customer Name */
             customer_name?: string | null;
             /** Customer Email */
@@ -6678,6 +6955,11 @@ export interface components {
              * @description ID of an existing customer in the organization. The customer data will be pre-filled in the checkout form. The resulting order will be linked to this customer.
              */
             customer_id?: string | null;
+            /**
+             * Customer External Id
+             * @description ID of the customer in your system. If a matching customer exists on Polar, the resulting order will be linked to this customer. Otherwise, a new customer will be created with this external ID set.
+             */
+            customer_external_id?: string | null;
             /** Customer Name */
             customer_name?: string | null;
             /** Customer Email */
@@ -6775,6 +7057,11 @@ export interface components {
              * @description ID of an existing customer in the organization. The customer data will be pre-filled in the checkout form. The resulting order will be linked to this customer.
              */
             customer_id?: string | null;
+            /**
+             * Customer External Id
+             * @description ID of the customer in your system. If a matching customer exists on Polar, the resulting order will be linked to this customer. Otherwise, a new customer will be created with this external ID set.
+             */
+            customer_external_id?: string | null;
             /** Customer Name */
             customer_name?: string | null;
             /** Customer Email */
@@ -8019,9 +8306,20 @@ export interface components {
             metadata: {
                 [key: string]: string | number | boolean;
             };
-            /** Email */
+            /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id: string | null;
+            /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
             email: string;
-            /** Email Verified */
+            /**
+             * Email Verified
+             * @description Whether the customer email address is verified. The address is automatically verified when the customer accesses the customer portal using their email address.
+             */
             email_verified: boolean;
             /** Name */
             name: string | null;
@@ -8400,8 +8698,14 @@ export interface components {
                 [key: string]: string | number | boolean;
             };
             /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id?: string | null;
+            /**
              * Email
              * Format: email
+             * @description The email address of the customer. This must be unique within the organization.
              */
             email: string;
             /** Name */
@@ -8629,6 +8933,15 @@ export interface components {
             /** Products */
             products: components["schemas"]["CustomerProduct"][];
         };
+        /** CustomerPaymentMethodCreate */
+        CustomerPaymentMethodCreate: {
+            /** Confirmation Token Id */
+            confirmation_token_id: string;
+            /** Set Default */
+            set_default: boolean;
+            /** Return Url */
+            return_url: string;
+        };
         /** CustomerPortalCustomer */
         CustomerPortalCustomer: {
             /**
@@ -8664,6 +8977,16 @@ export interface components {
             oauth_accounts: {
                 [key: string]: components["schemas"]["CustomerPortalOAuthAccount"];
             };
+        };
+        /** CustomerPortalCustomerUpdate */
+        CustomerPortalCustomerUpdate: {
+            /** Email */
+            email?: string | null;
+            /** Name */
+            name?: string | null;
+            billing_address?: components["schemas"]["Address"] | null;
+            /** Tax Id */
+            tax_id?: string | null;
         };
         /** CustomerPortalOAuthAccount */
         CustomerPortalOAuthAccount: {
@@ -8800,10 +9123,21 @@ export interface components {
             organization_id: string;
         };
         /**
-         * CustomerSessionCreate
-         * @description Schema for creating a customer session.
+         * CustomerSessionCustomerExternalIDCreate
+         * @description Schema for creating a customer session using an external customer ID.
          */
-        CustomerSessionCreate: {
+        CustomerSessionCustomerExternalIDCreate: {
+            /**
+             * Customer External Id
+             * @description External ID of the customer to create a session for.
+             */
+            customer_external_id: string;
+        };
+        /**
+         * CustomerSessionCustomerIDCreate
+         * @description Schema for creating a customer session using a customer ID.
+         */
+        CustomerSessionCustomerIDCreate: {
             /**
              * Customer Id
              * Format: uuid4
@@ -9001,7 +9335,15 @@ export interface components {
             metadata?: {
                 [key: string]: string | number | boolean;
             } | null;
-            /** Email */
+            /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id?: string | null;
+            /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
             email?: string | null;
             /** Name */
             name?: string | null;
@@ -10893,9 +11235,20 @@ export interface components {
             metadata: {
                 [key: string]: string | number | boolean;
             };
-            /** Email */
+            /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id: string | null;
+            /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
             email: string;
-            /** Email Verified */
+            /**
+             * Email Verified
+             * @description Whether the customer email address is verified. The address is automatically verified when the customer accesses the customer portal using their email address.
+             */
             email_verified: boolean;
             /** Name */
             name: string | null;
@@ -11242,12 +11595,6 @@ export interface components {
             items: components["schemas"]["Organization"][];
             pagination: components["schemas"]["Pagination"];
         };
-        /** ListResource[PaymentMethod] */
-        ListResource_PaymentMethod_: {
-            /** Items */
-            items: components["schemas"]["PaymentMethod"][];
-            pagination: components["schemas"]["Pagination"];
-        };
         /** ListResource[PersonalAccessToken] */
         ListResource_PersonalAccessToken_: {
             /** Items */
@@ -11294,6 +11641,12 @@ export interface components {
         ListResource_Transaction_: {
             /** Items */
             items: components["schemas"]["Transaction"][];
+            pagination: components["schemas"]["Pagination"];
+        };
+        /** ListResource[Union[PaymentMethodCard, PaymentMethodGeneric]] */
+        ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__: {
+            /** Items */
+            items: (components["schemas"]["PaymentMethodCard"] | components["schemas"]["PaymentMethodGeneric"])[];
             pagination: components["schemas"]["Pagination"];
         };
         /** ListResource[WebhookDelivery] */
@@ -12291,9 +12644,20 @@ export interface components {
             metadata: {
                 [key: string]: string | number | boolean;
             };
-            /** Email */
+            /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id: string | null;
+            /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
             email: string;
-            /** Email Verified */
+            /**
+             * Email Verified
+             * @description Whether the customer email address is verified. The address is automatically verified when the customer accesses the customer portal using their email address.
+             */
             email_verified: boolean;
             /** Name */
             name: string | null;
@@ -12874,23 +13238,50 @@ export interface components {
             /** Detail */
             detail: string;
         };
-        /** PaymentMethod */
-        PaymentMethod: {
-            /** Stripe Payment Method Id */
-            stripe_payment_method_id: string;
+        /** PaymentMethodCard */
+        PaymentMethodCard: {
+            /** Id */
+            id: string;
             /**
              * Type
-             * @enum {unknown}
+             * @constant
              */
-            type: "card" | null;
+            type: "card";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Default */
+            default: boolean;
+            card: components["schemas"]["PaymentMethodCardData"];
+        };
+        /** PaymentMethodCardData */
+        PaymentMethodCardData: {
             /** Brand */
-            brand: string | null;
+            brand: string;
             /** Last4 */
             last4: string;
             /** Exp Month */
             exp_month: number;
             /** Exp Year */
             exp_year: number;
+            /** Wallet */
+            wallet?: string | null;
+        };
+        /** PaymentMethodGeneric */
+        PaymentMethodGeneric: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Default */
+            default: boolean;
         };
         /**
          * PaymentProcessor
@@ -14440,9 +14831,20 @@ export interface components {
             metadata: {
                 [key: string]: string | number | boolean;
             };
-            /** Email */
+            /**
+             * External Id
+             * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
+             */
+            external_id: string | null;
+            /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
             email: string;
-            /** Email Verified */
+            /**
+             * Email Verified
+             * @description Whether the customer email address is verified. The address is automatically verified when the customer accesses the customer portal using their email address.
+             */
             email_verified: boolean;
             /** Name */
             name: string | null;
@@ -17161,57 +17563,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    "payment_methods:list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListResource_PaymentMethod_"];
-                };
-            };
-        };
-    };
-    "payment_methods:detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentMethod"];
-                };
             };
             /** @description Validation Error */
             422: {
@@ -22156,6 +22507,131 @@ export interface operations {
             };
         };
     };
+    "customers:get_external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer external ID. */
+                external_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            /** @description Customer not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceNotFound"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customers:delete_external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer external ID. */
+                external_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Customer deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Customer not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceNotFound"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customers:update_external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The customer external ID. */
+                external_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Customer updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            /** @description Customer not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceNotFound"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     "customer_portal:benefit-grants:list": {
         parameters: {
             query?: {
@@ -22303,10 +22779,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                /** @description The customer ID. */
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -22320,7 +22793,127 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerPortalCustomer"];
                 };
             };
-            /** @description Customer not found. */
+        };
+    };
+    "customer_portal:customers:update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPortalCustomerUpdate"];
+            };
+        };
+        responses: {
+            /** @description Customer updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPortalCustomer"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:get_payment_methods": {
+        parameters: {
+            query?: {
+                /** @description Page number, defaults to 1. */
+                page?: number;
+                /** @description Size of a page, defaults to 10. Maximum is 100. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListResource_Union_PaymentMethodCard__PaymentMethodGeneric__"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:add_payment_method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPaymentMethodCreate"];
+            };
+        };
+        responses: {
+            /** @description Payment method created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodCard"] | components["schemas"]["PaymentMethodGeneric"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    "customer_portal:customers:delete_payment_method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment method deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Payment method not found. */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -23233,7 +23826,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CustomerSessionCreate"];
+                "application/json": components["schemas"]["CustomerSessionCustomerIDCreate"] | components["schemas"]["CustomerSessionCustomerExternalIDCreate"];
             };
         };
         responses: {
@@ -23600,7 +24193,7 @@ export interface operations {
                 /** @description Filter by customer ID. */
                 customer_id?: string | string[] | null;
                 /** @description Filter by external customer ID. */
-                exernal_customer_id?: string | string[] | null;
+                external_customer_id?: string | string[] | null;
             };
             header?: never;
             path: {

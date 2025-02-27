@@ -1,10 +1,12 @@
+import uuid
+
 import structlog
 from sqlalchemy import delete, select
 from sqlalchemy.orm import joinedload
 
 from polar.auth.models import AuthSubject, Organization, User
 from polar.config import settings
-from polar.customer.service import customer as customer_service
+from polar.customer.repository import CustomerRepository
 from polar.enums import TokenType
 from polar.exceptions import PolarRequestValidationError
 from polar.kit.crypto import generate_token_hash_pair, get_token_hash
@@ -14,7 +16,7 @@ from polar.logging import Logger
 from polar.models import Customer, CustomerSession
 from polar.postgres import AsyncSession
 
-from .schemas import CustomerSessionCreate
+from .schemas import CustomerSessionCreate, CustomerSessionCustomerIDCreate
 
 log: Logger = structlog.get_logger()
 
@@ -28,20 +30,34 @@ class CustomerSessionService(ResourceServiceReader[CustomerSession]):
         auth_subject: AuthSubject[User | Organization],
         customer_create: CustomerSessionCreate,
     ) -> CustomerSession:
-        customer = await customer_service.user_get_by_id(
-            session,
-            auth_subject,
-            customer_create.customer_id,
-            options=(joinedload(Customer.organization),),
+        repository = CustomerRepository.from_session(session)
+        statement = repository.get_readable_statement(auth_subject).options(
+            joinedload(Customer.organization),
         )
+
+        id_field: str
+        id_value: uuid.UUID | str
+        if isinstance(customer_create, CustomerSessionCustomerIDCreate):
+            statement = statement.where(Customer.id == customer_create.customer_id)
+            id_field = "customer_id"
+            id_value = customer_create.customer_id
+        else:
+            statement = statement.where(
+                Customer.external_id == customer_create.customer_external_id
+            )
+            id_field = "customer_external_id"
+            id_value = customer_create.customer_external_id
+
+        customer = await repository.get_one_or_none(statement)
+
         if customer is None:
             raise PolarRequestValidationError(
                 [
                     {
-                        "loc": ("body", "customer_id"),
+                        "loc": ("body", id_field),
                         "msg": "Customer does not exist.",
                         "type": "value_error",
-                        "input": customer_create.customer_id,
+                        "input": id_value,
                     }
                 ]
             )

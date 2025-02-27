@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     String,
+    UniqueConstraint,
     Uuid,
     func,
 )
@@ -23,7 +24,6 @@ from polar.kit.tax import TaxID, TaxIDType
 
 if TYPE_CHECKING:
     from .organization import Organization
-    from .user import User
 
 
 class CustomerOAuthPlatform(StrEnum):
@@ -73,8 +73,10 @@ class Customer(MetadataMixin, RecordModel):
             func.lower(Column("email")),
             unique=True,
         ),
+        UniqueConstraint("organization_id", "external_id"),
     )
 
+    external_id: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     email: Mapped[str] = mapped_column(String(320), nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     stripe_customer_id: Mapped[str | None] = mapped_column(
@@ -86,19 +88,6 @@ class Customer(MetadataMixin, RecordModel):
         AddressType, nullable=True, default=None
     )
     tax_id: Mapped[TaxID | None] = mapped_column(TaxIDType, nullable=True, default=None)
-
-    user_id: Mapped[UUID | None] = mapped_column(
-        Uuid, ForeignKey("users.id", ondelete="set null"), nullable=True
-    )
-
-    @declared_attr
-    def user(cls) -> Mapped["User | None"]:
-        return relationship(
-            "User",
-            lazy="raise",
-            back_populates="customers",
-            foreign_keys="[Customer.user_id]",
-        )
 
     _oauth_accounts: Mapped[dict[str, dict[str, Any]]] = mapped_column(
         "oauth_accounts", JSONB, nullable=False, default=dict

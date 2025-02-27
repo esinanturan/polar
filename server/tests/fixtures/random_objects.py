@@ -15,6 +15,8 @@ from polar.enums import (
     Platforms,
     SubscriptionRecurringInterval,
 )
+from polar.kit.address import Address
+from polar.kit.tax import TaxID
 from polar.kit.utils import utc_now
 from polar.models import (
     Account,
@@ -917,21 +919,25 @@ async def create_customer(
     save_fixture: SaveFixture,
     *,
     organization: Organization,
+    external_id: str | None = None,
     email: str = "customer@example.com",
     email_verified: bool = False,
     name: str = "Customer",
     stripe_customer_id: str = "STRIPE_CUSTOMER_ID",
+    billing_address: Address | None = None,
+    tax_id: TaxID | None = None,
     user_metadata: dict[str, Any] = {},
-    user: User | None = None,
 ) -> Customer:
     customer = Customer(
+        external_id=external_id,
         email=email,
         email_verified=email_verified,
         name=name,
         stripe_customer_id=stripe_customer_id,
         organization=organization,
+        billing_address=billing_address,
+        tax_id=tax_id,
         user_metadata=user_metadata,
-        user=user,
     )
     await save_fixture(customer)
     return customer
@@ -1455,6 +1461,20 @@ async def customer_second(
         organization=organization,
         email=lstr("customer.second@example.com"),
         stripe_customer_id=lstr("STRIPE_CUSTOMER_ID_2"),
+    )
+
+
+@pytest_asyncio.fixture
+async def customer_external_id(
+    save_fixture: SaveFixture,
+    organization: Organization,
+) -> Customer:
+    return await create_customer(
+        save_fixture,
+        organization=organization,
+        external_id=lstr("CUSTOMER_EXTERNAL_ID"),
+        email=lstr("customer.external_id@example.com"),
+        stripe_customer_id=lstr("STRIPE_CUSTOMER_ID_3"),
     )
 
 

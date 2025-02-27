@@ -7,7 +7,7 @@ import { DashboardBody } from '@/components/Layout/DashboardLayout'
 import { InlineModal } from '@/components/Modal/InlineModal'
 import { toast } from '@/components/Toast/use-toast'
 import { useDeleteDiscount, useDiscounts } from '@/hooks/queries'
-import useDebouncedCallback from '@/hooks/utils'
+import { useDebouncedCallback } from '@/hooks/utils'
 import {
   DataTablePaginationState,
   DataTableSortingState,
@@ -267,7 +267,7 @@ const ClientPage: React.FC<ClientPageProps> = ({
   const deleteDiscount = useDeleteDiscount()
 
   return (
-    <DashboardBody>
+    <DashboardBody wide>
       <div className="flex flex-col gap-8">
         <div className="flex flex-row items-center justify-between gap-6">
           <Input

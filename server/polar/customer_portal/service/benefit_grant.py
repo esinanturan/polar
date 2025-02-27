@@ -6,8 +6,8 @@ from typing import Any, cast
 from sqlalchemy import Select, UnaryExpression, asc, desc, or_, select
 from sqlalchemy.orm import contains_eager, joinedload
 
-from polar.auth.models import AuthSubject, is_customer, is_user
-from polar.customer.service import customer as customer_service
+from polar.auth.models import AuthSubject
+from polar.customer.repository import CustomerRepository
 from polar.exceptions import NotPermitted, PolarRequestValidationError
 from polar.kit.db.postgres import AsyncSession
 from polar.kit.pagination import PaginationParams, paginate
@@ -20,7 +20,6 @@ from polar.models import (
     Order,
     Organization,
     Subscription,
-    User,
 )
 from polar.models.benefit import BenefitType
 from polar.worker import enqueue_job
@@ -42,7 +41,7 @@ class CustomerBenefitGrantService(ResourceServiceReader[BenefitGrant]):
     async def list(
         self,
         session: AsyncSession,
-        auth_subject: AuthSubject[User | Customer],
+        auth_subject: AuthSubject[Customer],
         *,
         type: Sequence[BenefitType] | None = None,
         benefit_id: Sequence[uuid.UUID] | None = None,
@@ -112,7 +111,7 @@ class CustomerBenefitGrantService(ResourceServiceReader[BenefitGrant]):
     async def get_by_id(
         self,
         session: AsyncSession,
-        auth_subject: AuthSubject[User | Customer],
+        auth_subject: AuthSubject[Customer],
         id: uuid.UUID,
     ) -> BenefitGrant | None:
         statement = (
@@ -153,7 +152,8 @@ class CustomerBenefitGrantService(ResourceServiceReader[BenefitGrant]):
             account_id = benefit_grant_update.properties["account_id"]
             platform = benefit_grant_update.get_oauth_platform()
 
-            customer = await customer_service.get(session, benefit_grant.customer_id)
+            customer_repository = CustomerRepository.from_session(session)
+            customer = await customer_repository.get_by_id(benefit_grant.customer_id)
             assert customer is not None
 
             oauth_account = customer.get_oauth_account(account_id, platform)
@@ -188,15 +188,16 @@ class CustomerBenefitGrantService(ResourceServiceReader[BenefitGrant]):
         return benefit_grant
 
     def _get_readable_benefit_grant_statement(
-        self, auth_subject: AuthSubject[User | Customer]
+        self, auth_subject: AuthSubject[Customer]
     ) -> Select[tuple[BenefitGrant]]:
-        statement = (
+        return (
             select(BenefitGrant)
             .join(Benefit, onclause=Benefit.id == BenefitGrant.benefit_id)
             .join(Organization, onclause=Benefit.organization_id == Organization.id)
             .where(
                 BenefitGrant.deleted_at.is_(None),
                 BenefitGrant.is_revoked.is_(False),
+                BenefitGrant.customer_id == auth_subject.subject.id,
             )
             .options(
                 contains_eager(BenefitGrant.benefit).options(
@@ -204,21 +205,6 @@ class CustomerBenefitGrantService(ResourceServiceReader[BenefitGrant]):
                 ),
             )
         )
-
-        if is_user(auth_subject):
-            statement = statement.where(
-                BenefitGrant.customer_id.in_(
-                    select(Customer.id).where(
-                        Customer.user_id == auth_subject.subject.id
-                    )
-                )
-            )
-        elif is_customer(auth_subject):
-            statement = statement.where(
-                BenefitGrant.customer_id == auth_subject.subject.id
-            )
-
-        return statement
 
 
 customer_benefit_grant = CustomerBenefitGrantService(BenefitGrant)

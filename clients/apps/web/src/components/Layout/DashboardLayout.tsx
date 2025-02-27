@@ -6,78 +6,20 @@ import { MaintainerOrganizationContext } from '@/providers/maintainerOrganizatio
 import { setLastVisitedOrg } from '@/utils/cookies'
 import { organizationPageLink } from '@/utils/nav'
 import Button from '@polar-sh/ui/components/atoms/Button'
+import { SidebarTrigger } from '@polar-sh/ui/components/atoms/Sidebar'
 import { Tabs, TabsList, TabsTrigger } from '@polar-sh/ui/components/atoms/Tabs'
-import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  PropsWithChildren,
-  UIEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
-import MaintainerNavigation from '../Dashboard/DashboardNavigation'
 import { DashboardProvider } from '../Dashboard/DashboardProvider'
 import { SubRouteWithActive } from '../Dashboard/navigation'
-import DashboardProfileDropdown from '../Navigation/DashboardProfileDropdown'
-import DashboardTopbar from '../Navigation/DashboardTopbar'
 import { useRoute } from '../Navigation/useRoute'
-import { BrandingMenu } from './Public/BrandingMenu'
+import { DashboardSidebar } from './Dashboard/DashboardSidebar'
 import TopbarRight from './Public/TopbarRight'
-
-const DashboardSidebar = () => {
-  const [scrollTop, setScrollTop] = useState(0)
-  const { currentUser } = useAuth()
-
-  const handleScroll: UIEventHandler<HTMLDivElement> = useCallback((e) => {
-    setScrollTop(e.currentTarget.scrollTop)
-  }, [])
-
-  const shouldRenderUpperBorder = useMemo(() => scrollTop > 0, [scrollTop])
-
-  const upperScrollClassName = shouldRenderUpperBorder
-    ? 'border-b dark:border-b-polar-700 border-b-gray-200'
-    : ''
-
-  if (!currentUser) {
-    return <></>
-  }
-
-  return (
-    <aside
-      className={twMerge(
-        'flex h-full w-full flex-shrink-0 flex-col justify-between gap-y-4 overflow-y-auto md:w-[220px] md:overflow-y-visible',
-      )}
-    >
-      <div className="flex h-full flex-col gap-y-6">
-        <div className="hidden md:flex">
-          <BrandingMenu />
-        </div>
-
-        <div className={upperScrollClassName}>
-          <DashboardProfileDropdown />
-        </div>
-
-        <div
-          className="flex w-full flex-grow flex-col gap-y-12 md:h-full md:justify-between md:overflow-y-auto"
-          onScroll={handleScroll}
-        >
-          <div className="flex flex-col gap-y-12">
-            <MaintainerNavigation />
-          </div>
-        </div>
-      </div>
-    </aside>
-  )
-}
 
 const DashboardLayout = (
   props: PropsWithChildren<{
-    breadcrumb?: React.ReactNode
     className?: string
   }>,
 ) => {
@@ -89,7 +31,7 @@ const DashboardLayout = (
 
   return (
     <DashboardProvider organization={organization}>
-      <div className="relative flex h-full w-full flex-col gap-x-8 bg-gray-100 md:flex-row md:p-4 dark:bg-transparent">
+      <div className="relative flex h-full w-full flex-col bg-gray-100 md:flex-row md:p-2 dark:bg-transparent">
         <MobileNav />
         <div className="hidden md:flex">
           <DashboardSidebar />
@@ -100,7 +42,6 @@ const DashboardLayout = (
             props.className,
           )}
         >
-          <DashboardTopbar breadcrumb={props.breadcrumb} />
           {/* On large devices, scroll here. On small devices the _document_ is the only element that should scroll. */}
           <main className="relative flex min-h-0 w-full flex-grow flex-col">
             {props.children}
@@ -143,12 +84,7 @@ const MobileNav = () => {
           </Link>
         ) : null}
         <TopbarRight authenticatedUser={currentUser} />
-        <div
-          className="dark:text-polar-200 flex flex-row items-center justify-center text-gray-700"
-          onClick={() => setMobileNavOpen((toggle) => !toggle)}
-        >
-          {mobileNavOpen ? <X /> : <Menu />}
-        </div>
+        <SidebarTrigger />
       </div>
     </div>
   )
@@ -193,6 +129,19 @@ const SubNav = (props: { items: SubRouteWithActive[] }) => {
   )
 }
 
+export interface DashboardBodyProps {
+  children?: React.ReactNode
+  className?: string
+  wrapperClassName?: string
+  title?: JSX.Element | string
+  contextView?: React.ReactElement
+  contextViewClassName?: string
+  contextViewPlacement?: 'left' | 'right'
+  header?: JSX.Element | boolean
+  wide?: boolean
+  transparent?: boolean
+}
+
 export const DashboardBody = ({
   children,
   className,
@@ -200,20 +149,11 @@ export const DashboardBody = ({
   title,
   contextView,
   contextViewClassName,
+  contextViewPlacement = 'right',
   header = true,
   wide = false,
   transparent = false,
-}: {
-  children?: React.ReactNode
-  wrapperClassName?: string
-  className?: string
-  title?: JSX.Element | string
-  contextView?: React.ReactElement
-  contextViewClassName?: string
-  header?: JSX.Element | boolean
-  wide?: boolean
-  transparent?: boolean
-}) => {
+}: DashboardBodyProps) => {
   const currentRoute = useRoute()
   const [scrolled, setScrolled] = useState(false)
 
@@ -230,14 +170,19 @@ export const DashboardBody = ({
   )
 
   return (
-    <div className={twMerge('flex h-full w-full flex-row gap-x-3')}>
+    <div
+      className={twMerge(
+        'flex h-full w-full flex-row gap-x-2',
+        contextViewPlacement === 'left' ? 'flex-row-reverse' : '',
+      )}
+    >
       <div
         onScroll={handleScroll}
         className={twMerge(
           'relative flex w-full flex-col items-center px-4 md:overflow-y-auto',
           transparent
             ? 'bg-transparent dark:bg-transparent'
-            : 'dark:md:bg-polar-900 dark:border-polar-700 rounded-2xl border-gray-200 md:border md:bg-white md:px-12 md:shadow-sm',
+            : 'dark:md:bg-polar-900 dark:border-polar-800 rounded-2xl border-gray-200 md:border md:bg-white md:px-12 md:shadow-sm',
           transparent && scrolled
             ? 'dark:border-polar-700 border-t border-gray-200'
             : '',
@@ -282,7 +227,7 @@ export const DashboardBody = ({
       {contextView ? (
         <div
           className={twMerge(
-            'dark:bg-polar-900 dark:border-polar-700 w-full overflow-y-auto rounded-2xl border border-gray-200 bg-white md:max-w-[320px] md:shadow-sm xl:max-w-[440px]',
+            'dark:bg-polar-900 dark:border-polar-800 w-full overflow-y-auto rounded-2xl border border-gray-200 bg-white md:max-w-[320px] md:shadow-sm xl:max-w-[440px]',
             contextViewClassName,
           )}
         >
