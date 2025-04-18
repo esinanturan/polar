@@ -2,6 +2,8 @@
 
 Sent when a new subscription is created.
 
+When this event occurs, the subscription `status` might not be `active` yet, as we can still have to wait for the first payment to be processed.
+
 **Discord & Slack support:** Full
 
 ```json Payload Sample [expandable]
@@ -24,7 +26,6 @@ Sent when a new subscription is created.
     "ended_at": "2019-08-24T14:15:22Z",
     "customer_id": "string",
     "product_id": "string",
-    "price_id": "string",
     "discount_id": "string",
     "checkout_id": "string",
     "customer_cancellation_reason": "customer_service",
@@ -38,38 +39,32 @@ Sent when a new subscription is created.
       "property2": "string"
     },
     "customer": {
+      "id": "992fae2a-2a17-4b7a-8d9e-e287cf90131b",
       "created_at": "2019-08-24T14:15:22Z",
       "modified_at": "2019-08-24T14:15:22Z",
-      "id": "string",
       "metadata": {
         "property1": "string",
         "property2": "string"
       },
-      "email": "string",
+      "external_id": "usr_1337",
+      "email": "customer@example.com",
       "email_verified": true,
-      "name": "string",
+      "name": "John Doe",
       "billing_address": {
         "line1": "string",
         "line2": "string",
         "postal_code": "string",
         "city": "string",
         "state": "string",
-        "country": "string"
+        "country": "US"
       },
       "tax_id": [
-        "string",
-        "ad_nrt"
+        "911144442",
+        "us_ein"
       ],
-      "organization_id": "string",
-      "avatar_url": "string"
-    },
-    "user_id": "string",
-    "user": {
-      "id": "string",
-      "email": "string",
-      "public_name": "string",
-      "avatar_url": "string",
-      "github_username": "string"
+      "organization_id": "1dbfc517-0bbf-4301-9ba8-555ca42b9737",
+      "deleted_at": "2019-08-24T14:15:22Z",
+      "avatar_url": "https://www.gravatar.com/avatar/xxx?d=blank"
     },
     "product": {
       "created_at": "2019-08-24T14:15:22Z",
@@ -102,17 +97,20 @@ Sent when a new subscription is created.
       ],
       "benefits": [
         {
+          "id": "string",
           "created_at": "2019-08-24T14:15:22Z",
           "modified_at": "2019-08-24T14:15:22Z",
-          "id": "string",
-          "type": "ads",
+          "type": "custom",
           "description": "string",
           "selectable": true,
           "deletable": true,
           "organization_id": "string",
+          "metadata": {
+            "property1": "string",
+            "property2": "string"
+          },
           "properties": {
-            "image_height": 400,
-            "image_width": 400
+            "note": "string"
           }
         }
       ],
@@ -151,7 +149,7 @@ Sent when a new subscription is created.
             "type": "text",
             "slug": "string",
             "name": "string",
-            "organization_id": "string",
+            "organization_id": "1dbfc517-0bbf-4301-9ba8-555ca42b9737",
             "properties": {
               "form_label": "string",
               "form_help_text": "string",
@@ -165,19 +163,6 @@ Sent when a new subscription is created.
           "required": true
         }
       ]
-    },
-    "price": {
-      "created_at": "2019-08-24T14:15:22Z",
-      "modified_at": "2019-08-24T14:15:22Z",
-      "id": "string",
-      "amount_type": "fixed",
-      "is_archived": true,
-      "product_id": "string",
-      "type": "recurring",
-      "recurring_interval": "month",
-      "price_currency": "string",
-      "price_amount": 0,
-      "legacy": true
     },
     "discount": {
       "duration": "once",
@@ -197,8 +182,58 @@ Sent when a new subscription is created.
       "ends_at": "2019-08-24T14:15:22Z",
       "max_redemptions": 0,
       "redemptions_count": 0,
-      "organization_id": "string"
-    }
+      "organization_id": "1dbfc517-0bbf-4301-9ba8-555ca42b9737"
+    },
+    "prices": [
+      {
+        "created_at": "2019-08-24T14:15:22Z",
+        "modified_at": "2019-08-24T14:15:22Z",
+        "id": "string",
+        "amount_type": "fixed",
+        "is_archived": true,
+        "product_id": "string",
+        "type": "recurring",
+        "recurring_interval": "month",
+        "price_currency": "string",
+        "price_amount": 0,
+        "legacy": true
+      }
+    ],
+    "meters": [
+      {
+        "created_at": "2019-08-24T14:15:22Z",
+        "modified_at": "2019-08-24T14:15:22Z",
+        "id": "string",
+        "consumed_units": 25,
+        "credited_units": 100,
+        "amount": 0,
+        "meter_id": "d498a884-e2cd-4d3e-8002-f536468a8b22",
+        "meter": {
+          "metadata": {
+            "property1": "string",
+            "property2": "string"
+          },
+          "created_at": "2019-08-24T14:15:22Z",
+          "modified_at": "2019-08-24T14:15:22Z",
+          "id": "string",
+          "name": "string",
+          "filter": {
+            "conjunction": "and",
+            "clauses": [
+              {
+                "property": "string",
+                "operator": "eq",
+                "value": "string"
+              }
+            ]
+          },
+          "aggregation": {
+            "func": "count"
+          },
+          "organization_id": "string"
+        }
+      }
+    ]
   }
 }
 ```
