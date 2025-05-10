@@ -284,7 +284,7 @@ const Testamonial = ({
     <Link
       href={link}
       target="_blank"
-      className="dark:bg-polar-900 dark:border-polar-800 dark:hover:bg-polar-800 flex h-full flex-row gap-x-4 rounded-2xl border border-gray-200 bg-white p-6 transition-colors hover:bg-white"
+      className="dark:bg-polar-900 dark:border-polar-800 dark:hover:bg-polar-800 flex h-full flex-row gap-x-4 rounded-2xl border border-transparent bg-white p-6 transition-colors hover:bg-white"
     >
       <div className="flex flex-col gap-y-4 pt-1.5">
         <div className="flex flex-row items-center gap-x-3">
@@ -315,10 +315,7 @@ export const Testimonials = () => {
   const secondRow = testimonials.slice(halfLength)
 
   return (
-    <div className="flex flex-col items-center gap-y-12 px-4 md:gap-y-24 md:px-0 md:py-24">
-      <h3 className="text-center text-3xl leading-snug md:text-5xl">
-        Loved by thousands of developers
-      </h3>
+    <div className="flex flex-col items-center gap-y-12 px-4 md:gap-y-24 md:px-0">
       <div className="flex flex-col gap-4 md:relative md:w-full md:overflow-hidden">
         <div className="flex flex-col gap-y-4 md:hidden">
           {firstRow.map((testimonial, index) => (

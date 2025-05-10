@@ -82,7 +82,7 @@ from polar.subscription.service import subscription as subscription_service
 from polar.webhook.service import webhook as webhook_service
 from polar.worker import enqueue_job
 
-from ..kit.tax import TaxCalculationError, calculate_tax
+from ..kit.tax import InvalidTaxID, TaxCalculationError, calculate_tax
 from . import ip_geolocation
 from .eventstream import CheckoutEvent, publish_checkout_event
 from .repository import CheckoutRepository
@@ -153,23 +153,20 @@ class ArchivedPriceCheckout(CheckoutError):
         super().__init__(message)
 
 
-class PaymentIntentNotSucceeded(CheckoutError):
-    def __init__(self, checkout: Checkout, payment_intent_id: str) -> None:
+class IntentNotSucceeded(CheckoutError):
+    def __init__(self, checkout: Checkout, intent_id: str) -> None:
         self.checkout = checkout
-        self.payment_intent_id = payment_intent_id
-        message = (
-            f"Payment intent {payment_intent_id} for {checkout.id} is not successful."
-        )
+        self.intent_id = intent_id
+        message = f"Intent {intent_id} for {checkout.id} is not successful."
         super().__init__(message)
 
 
-class NoPaymentMethodOnPaymentIntent(CheckoutError):
-    def __init__(self, checkout: Checkout, payment_intent_id: str) -> None:
+class NoPaymentMethodOnIntent(CheckoutError):
+    def __init__(self, checkout: Checkout, intent_id: str) -> None:
         self.checkout = checkout
-        self.payment_intent_id = payment_intent_id
+        self.intent_id = intent_id
         message = (
-            f"Payment intent {payment_intent_id} "
-            f"for {checkout.id} has no payment method associated."
+            f"Intent {intent_id} for {checkout.id} has no payment method associated."
         )
         super().__init__(message)
 
@@ -325,7 +322,7 @@ class CheckoutService:
                     checkout_create.customer_tax_id,
                     checkout_create.customer_billing_address.country,
                 )
-            except ValueError as e:
+            except InvalidTaxID as e:
                 raise PolarRequestValidationError(
                     [
                         {
@@ -455,6 +452,14 @@ class CheckoutService:
                 **(checkout.payment_processor_metadata or {}),
                 "publishable_key": settings.STRIPE_PUBLISHABLE_KEY,
             }
+            if checkout.customer and checkout.customer.stripe_customer_id is not None:
+                stripe_customer_session = await stripe_service.create_customer_session(
+                    checkout.customer.stripe_customer_id
+                )
+                checkout.payment_processor_metadata = {
+                    **(checkout.payment_processor_metadata or {}),
+                    "customer_session_client_secret": stripe_customer_session.client_secret,
+                }
 
         session.add(checkout)
 
@@ -805,7 +810,7 @@ class CheckoutService:
                 "customer_id": stripe_customer_id,
             }
 
-            if checkout.is_payment_required or checkout.is_payment_setup_required:
+            if checkout.is_payment_form_required:
                 assert checkout_confirm.confirmation_token_id is not None
                 assert checkout.customer_billing_address is not None
                 intent_metadata: dict[str, str] = {
@@ -870,7 +875,7 @@ class CheckoutService:
                         "intent_status": intent.status,
                     }
 
-        if not checkout.is_payment_required:
+        if not checkout.is_payment_form_required:
             enqueue_job("checkout.handle_free_success", checkout_id=checkout.id)
 
         checkout.status = CheckoutStatus.confirmed
@@ -893,7 +898,7 @@ class CheckoutService:
         self,
         session: AsyncSession,
         checkout_id: uuid.UUID,
-        payment_intent: stripe_lib.PaymentIntent,
+        intent: stripe_lib.PaymentIntent | stripe_lib.SetupIntent,
     ) -> Checkout:
         repository = CheckoutRepository.from_session(session)
         checkout = await repository.get_by_id(
@@ -910,21 +915,26 @@ class CheckoutService:
         if product_price.is_archived:
             raise ArchivedPriceCheckout(checkout)
 
-        if payment_intent.status != "succeeded":
-            raise PaymentIntentNotSucceeded(checkout, payment_intent.id)
+        if intent.status != "succeeded":
+            raise IntentNotSucceeded(checkout, intent.id)
 
-        if payment_intent.payment_method is None:
-            raise NoPaymentMethodOnPaymentIntent(checkout, payment_intent.id)
+        if intent.payment_method is None:
+            raise NoPaymentMethodOnIntent(checkout, intent.id)
 
         product = checkout.product
         if product.is_recurring:
-            await subscription_service.create_or_update_from_checkout(
-                session, checkout, payment_intent
+            s = await subscription_service.create_or_update_from_checkout(
+                session, checkout, intent
             )
         else:
-            await order_service.create_from_checkout(session, checkout, payment_intent)
+            assert isinstance(intent, stripe_lib.PaymentIntent)
+            await order_service.create_from_checkout(session, checkout, intent)
 
         checkout.status = CheckoutStatus.succeeded
+        checkout.payment_processor_metadata = {
+            **checkout.payment_processor_metadata,
+            "intent_status": intent.status,
+        }
         session.add(checkout)
 
         await self._after_checkout_updated(session, checkout)
@@ -935,7 +945,7 @@ class CheckoutService:
         self,
         session: AsyncSession,
         checkout_id: uuid.UUID,
-        payment_intent: stripe_lib.PaymentIntent,
+        intent: stripe_lib.PaymentIntent | stripe_lib.SetupIntent,
     ) -> Checkout:
         repository = CheckoutRepository.from_session(session)
         checkout = await repository.get_by_id(
@@ -945,13 +955,20 @@ class CheckoutService:
         if checkout is None:
             raise CheckoutDoesNotExist(checkout_id)
 
-        # Checkout is not confirmed: do nothing
-        # This is the case of an immediate failure, e.g. card declined
-        # In this case, the checkout is still open and the user can retry
-        if checkout.status != CheckoutStatus.confirmed:
+        # Checkout is in an unrecoverable status: do nothing
+        if checkout.status in {
+            CheckoutStatus.expired,
+            CheckoutStatus.succeeded,
+            CheckoutStatus.failed,
+        }:
             return checkout
 
-        checkout.status = CheckoutStatus.failed
+        # Put back checkout in open state so the customer can try another payment method
+        checkout.status = CheckoutStatus.open
+        payment_processor_metadata = checkout.payment_processor_metadata
+        payment_processor_metadata.pop("intent_status", None)
+        payment_processor_metadata.pop("intent_client_secret", None)
+        checkout.payment_processor_metadata = payment_processor_metadata
         session.add(checkout)
 
         # Make sure to remove the Discount Redemptions
@@ -978,7 +995,7 @@ class CheckoutService:
         if checkout.status != CheckoutStatus.confirmed:
             raise NotConfirmedCheckout(checkout)
 
-        if checkout.is_payment_required:
+        if checkout.is_payment_form_required:
             raise PaymentRequired(checkout)
 
         product = checkout.product
@@ -1474,7 +1491,7 @@ class CheckoutService:
                     checkout.customer_tax_id = validate_tax_id(
                         customer_tax_id_number, customer_billing_address.country
                     )
-                except ValueError as e:
+                except InvalidTaxID as e:
                     raise PolarRequestValidationError(
                         [
                             {
@@ -1632,7 +1649,7 @@ class CheckoutService:
 
     def _get_required_confirm_fields(self, checkout: Checkout) -> set[str]:
         fields = {"customer_email"}
-        if checkout.is_payment_required or checkout.is_payment_setup_required:
+        if checkout.is_payment_form_required:
             fields.update({"customer_name", "customer_billing_address"})
         return fields
 

@@ -21,6 +21,8 @@ router = APIRouter(
 DIRECT_IMPLEMENTED_WEBHOOKS = {
     "payment_intent.succeeded",
     "payment_intent.payment_failed",
+    "setup_intent.succeeded",
+    "setup_intent.setup_failed",
     "charge.succeeded",
     "charge.dispute.closed",
     "refund.created",
@@ -30,6 +32,9 @@ DIRECT_IMPLEMENTED_WEBHOOKS = {
     "customer.subscription.deleted",
     "invoice.created",
     "invoice.paid",
+    "identity.verification_session.verified",
+    "identity.verification_session.processing",
+    "identity.verification_session.requires_input",
 }
 CONNECT_IMPLEMENTED_WEBHOOKS = {"account.updated", "payout.paid"}
 

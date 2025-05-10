@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/me/identity-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Identity Verification */
+        post: operations["users:create_identity_verification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/users/me/account": {
         parameters: {
             query?: never;
@@ -5081,6 +5098,8 @@ export interface components {
         BenefitMeterCreditCreateProperties: {
             /** Units */
             units: number;
+            /** Rollover */
+            rollover: boolean;
             /**
              * Meter Id
              * Format: uuid4
@@ -5094,6 +5113,8 @@ export interface components {
         BenefitMeterCreditProperties: {
             /** Units */
             units: number;
+            /** Rollover */
+            rollover: boolean;
             /**
              * Meter Id
              * Format: uuid4
@@ -5159,6 +5180,8 @@ export interface components {
         BenefitMeterCreditSubscriberProperties: {
             /** Units */
             units: number;
+            /** Rollover */
+            rollover: boolean;
             /**
              * Meter Id
              * Format: uuid4
@@ -8138,7 +8161,7 @@ export interface components {
             credited_units: number;
             /**
              * Balance
-             * @description The balance of the meter, i.e. the difference between credited and consumed units. Never goes negative.
+             * @description The balance of the meter, i.e. the difference between credited and consumed units.
              */
             balance: number;
             meter: components["schemas"]["CustomerCustomerMeterMeter"];
@@ -8219,7 +8242,7 @@ export interface components {
             credited_units: number;
             /**
              * Balance
-             * @description The balance of the meter, i.e. the difference between credited and consumed units. Never goes negative.
+             * @description The balance of the meter, i.e. the difference between credited and consumed units.
              */
             balance: number;
             /** @description The customer associated with this meter. */
@@ -8240,6 +8263,12 @@ export interface components {
         /** CustomerOrder */
         CustomerOrder: {
             /**
+             * Id
+             * Format: uuid4
+             * @description The ID of the object.
+             */
+            id: string;
+            /**
              * Created At
              * Format: date-time
              * @description Creation timestamp of the object.
@@ -8250,11 +8279,6 @@ export interface components {
              * @description Last modification timestamp of the object.
              */
             modified_at: string | null;
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
             status: components["schemas"]["OrderStatus"];
             /**
              * Paid
@@ -8277,6 +8301,12 @@ export interface components {
              */
             net_amount: number;
             /**
+             * Amount
+             * @deprecated
+             * @description Amount in cents, after discounts but before taxes.
+             */
+            amount: number;
+            /**
              * Tax Amount
              * @description Sales tax amount in cents.
              */
@@ -8298,6 +8328,8 @@ export interface components {
             refunded_tax_amount: number;
             /** Currency */
             currency: string;
+            billing_reason: components["schemas"]["OrderBillingReason"];
+            billing_address: components["schemas"]["Address"] | null;
             /**
              * Customer Id
              * Format: uuid4
@@ -8308,8 +8340,12 @@ export interface components {
              * Format: uuid4
              */
             product_id: string;
+            /** Discount Id */
+            discount_id: string | null;
             /** Subscription Id */
             subscription_id: string | null;
+            /** Checkout Id */
+            checkout_id: string | null;
             /**
              * User Id
              * Format: uuid4
@@ -8880,7 +8916,7 @@ export interface components {
             credited_units: number;
             /**
              * Balance
-             * @description The balance of the meter, i.e. the difference between credited and consumed units. Never goes negative.
+             * @description The balance of the meter, i.e. the difference between credited and consumed units.
              */
             balance: number;
         };
@@ -9321,10 +9357,46 @@ export interface components {
                 [key: string]: string | number | boolean;
             };
             /**
+             * Email
+             * @description The email address of the customer. This must be unique within the organization.
+             */
+            email?: string | null;
+            /**
+             * Name
+             * @description The name of the customer.
+             */
+            name?: string | null;
+            billing_address?: components["schemas"]["Address"] | null;
+            /** Tax Id */
+            tax_id?: [
+                string,
+                components["schemas"]["TaxIDFormat"]
+            ] | null;
+            /**
              * External Id
              * @description The ID of the customer in your system. This must be unique within the organization. Once set, it can't be updated.
              */
             external_id?: string | null;
+        };
+        /** CustomerUpdateExternalID */
+        CustomerUpdateExternalID: {
+            /**
+             * Metadata
+             * @description Key-value object allowing you to store additional information.
+             *
+             *     The key must be a string with a maximum length of **40 characters**.
+             *     The value must be either:
+             *
+             *     * A string with a maximum length of **500 characters**
+             *     * An integer
+             *     * A floating-point number
+             *     * A boolean
+             *
+             *     You can store up to **50 key-value pairs**.
+             */
+            metadata?: {
+                [key: string]: string | number | boolean;
+            };
             /**
              * Email
              * @description The email address of the customer. This must be unique within the organization.
@@ -10786,6 +10858,11 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * IdentityVerificationStatus
+         * @enum {string}
+         */
+        IdentityVerificationStatus: "unverified" | "pending" | "verified" | "failed";
         /** IntrospectTokenResponse */
         IntrospectTokenResponse: {
             /** Active */
@@ -11017,14 +11094,38 @@ export interface components {
             label: string;
             /**
              * Conditions
-             * @default {}
+             * @description Key-value object allowing you to set conditions that must match when validating the license key.
+             *
+             *     The key must be a string with a maximum length of **40 characters**.
+             *     The value must be either:
+             *
+             *     * A string with a maximum length of **500 characters**
+             *     * An integer
+             *     * A floating-point number
+             *     * A boolean
+             *
+             *     You can store up to **50 key-value pairs**.
              */
-            conditions: Record<string, never>;
+            conditions?: {
+                [key: string]: string | number | boolean;
+            };
             /**
              * Meta
-             * @default {}
+             * @description Key-value object allowing you to store additional information about the activation
+             *
+             *     The key must be a string with a maximum length of **40 characters**.
+             *     The value must be either:
+             *
+             *     * A string with a maximum length of **500 characters**
+             *     * An integer
+             *     * A floating-point number
+             *     * A boolean
+             *
+             *     You can store up to **50 key-value pairs**.
              */
-            meta: Record<string, never>;
+            meta?: {
+                [key: string]: string | number | boolean;
+            };
         };
         /** LicenseKeyActivationBase */
         LicenseKeyActivationBase: {
@@ -11041,7 +11142,9 @@ export interface components {
             /** Label */
             label: string;
             /** Meta */
-            meta: Record<string, never>;
+            meta: {
+                [key: string]: string | number | boolean;
+            };
             /**
              * Created At
              * Format: date-time
@@ -11065,7 +11168,9 @@ export interface components {
             /** Label */
             label: string;
             /** Meta */
-            meta: Record<string, never>;
+            meta: {
+                [key: string]: string | number | boolean;
+            };
             /**
              * Created At
              * Format: date-time
@@ -11158,8 +11263,20 @@ export interface components {
             /**
              * Id
              * Format: uuid4
+             * @description The ID of the object.
              */
             id: string;
+            /**
+             * Created At
+             * Format: date-time
+             * @description Creation timestamp of the object.
+             */
+            created_at: string;
+            /**
+             * Modified At
+             * @description Last modification timestamp of the object.
+             */
+            modified_at: string | null;
             /**
              * Organization Id
              * Format: uuid4
@@ -11248,17 +11365,41 @@ export interface components {
             increment_usage?: number | null;
             /**
              * Conditions
-             * @default {}
+             * @description Key-value object allowing you to set conditions that must match when validating the license key.
+             *
+             *     The key must be a string with a maximum length of **40 characters**.
+             *     The value must be either:
+             *
+             *     * A string with a maximum length of **500 characters**
+             *     * An integer
+             *     * A floating-point number
+             *     * A boolean
+             *
+             *     You can store up to **50 key-value pairs**.
              */
-            conditions: Record<string, never>;
+            conditions?: {
+                [key: string]: string | number | boolean;
+            };
         };
         /** LicenseKeyWithActivations */
         LicenseKeyWithActivations: {
             /**
              * Id
              * Format: uuid4
+             * @description The ID of the object.
              */
             id: string;
+            /**
+             * Created At
+             * Format: date-time
+             * @description Creation timestamp of the object.
+             */
+            created_at: string;
+            /**
+             * Modified At
+             * @description Last modification timestamp of the object.
+             */
+            modified_at: string | null;
             /**
              * Organization Id
              * Format: uuid4
@@ -12187,6 +12328,12 @@ export interface components {
         /** Order */
         Order: {
             /**
+             * Id
+             * Format: uuid4
+             * @description The ID of the object.
+             */
+            id: string;
+            /**
              * Created At
              * Format: date-time
              * @description Creation timestamp of the object.
@@ -12197,23 +12344,6 @@ export interface components {
              * @description Last modification timestamp of the object.
              */
             modified_at: string | null;
-            /**
-             * Id
-             * Format: uuid4
-             * @description The ID of the object.
-             */
-            id: string;
-            /** Metadata */
-            metadata: {
-                [key: string]: string | number | boolean;
-            };
-            /**
-             * Custom Field Data
-             * @description Key-value object storing custom field values.
-             */
-            custom_field_data?: {
-                [key: string]: string | number | boolean | null;
-            };
             status: components["schemas"]["OrderStatus"];
             /**
              * Paid
@@ -12281,6 +12411,17 @@ export interface components {
             subscription_id: string | null;
             /** Checkout Id */
             checkout_id: string | null;
+            /** Metadata */
+            metadata: {
+                [key: string]: string | number | boolean;
+            };
+            /**
+             * Custom Field Data
+             * @description Key-value object storing custom field values.
+             */
+            custom_field_data?: {
+                [key: string]: string | number | boolean | null;
+            };
             customer: components["schemas"]["OrderCustomer"];
             /**
              * User Id
@@ -14858,6 +14999,13 @@ export interface components {
             /** Account Id */
             account_id: string | null;
         };
+        /** UserIdentityVerification */
+        UserIdentityVerification: {
+            /** Id */
+            id: string;
+            /** Client Secret */
+            client_secret: string;
+        };
         /** UserInfoOrganization */
         UserInfoOrganization: {
             /** Sub */
@@ -14905,6 +15053,9 @@ export interface components {
             id: string;
             /** Accepted Terms Of Service */
             accepted_terms_of_service: boolean;
+            /** Identity Verified */
+            identity_verified: boolean;
+            identity_verification_status: components["schemas"]["IdentityVerificationStatus"];
             /** Oauth Accounts */
             oauth_accounts: components["schemas"]["OAuthAccountRead"][];
         };
@@ -14956,8 +15107,20 @@ export interface components {
             /**
              * Id
              * Format: uuid4
+             * @description The ID of the object.
              */
             id: string;
+            /**
+             * Created At
+             * Format: date-time
+             * @description Creation timestamp of the object.
+             */
+            created_at: string;
+            /**
+             * Modified At
+             * @description Last modification timestamp of the object.
+             */
+            modified_at: string | null;
             /**
              * Organization Id
              * Format: uuid4
@@ -15712,6 +15875,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserScopes"];
+                };
+            };
+        };
+    };
+    "users:create_identity_verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserIdentityVerification"];
                 };
             };
         };
@@ -20478,7 +20661,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CustomerUpdate"];
+                "application/json": components["schemas"]["CustomerUpdateExternalID"];
             };
         };
         responses: {
@@ -23461,6 +23644,7 @@ export const eventSourceValues: ReadonlyArray<components["schemas"]["EventSource
 export const fileServiceTypesValues: ReadonlyArray<components["schemas"]["FileServiceTypes"]> = ["downloadable", "product_media", "organization_avatar"];
 export const filterConjunctionValues: ReadonlyArray<components["schemas"]["FilterConjunction"]> = ["and", "or"];
 export const filterOperatorValues: ReadonlyArray<components["schemas"]["FilterOperator"]> = ["eq", "ne", "gt", "gte", "lt", "lte", "like", "not_like"];
+export const identityVerificationStatusValues: ReadonlyArray<components["schemas"]["IdentityVerificationStatus"]> = ["unverified", "pending", "verified", "failed"];
 export const introspectTokenResponseToken_typeValues: ReadonlyArray<components["schemas"]["IntrospectTokenResponse"]["token_type"]> = ["access_token", "refresh_token"];
 export const legacyRecurringProductPriceCustomAmount_typeValues: ReadonlyArray<components["schemas"]["LegacyRecurringProductPriceCustom"]["amount_type"]> = ["custom"];
 export const legacyRecurringProductPriceFixedAmount_typeValues: ReadonlyArray<components["schemas"]["LegacyRecurringProductPriceFixed"]["amount_type"]> = ["fixed"];

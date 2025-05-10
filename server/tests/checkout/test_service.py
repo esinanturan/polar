@@ -23,10 +23,10 @@ from polar.checkout.schemas import (
 from polar.checkout.service import (
     AlreadyActiveSubscriptionError,
     CheckoutDoesNotExist,
-    NoPaymentMethodOnPaymentIntent,
+    IntentNotSucceeded,
+    NoPaymentMethodOnIntent,
     NotConfirmedCheckout,
     NotOpenCheckout,
-    PaymentIntentNotSucceeded,
     PaymentRequired,
 )
 from polar.checkout.service import checkout as checkout_service
@@ -783,6 +783,7 @@ class TestCreate:
     )
     async def test_valid_subscription_upgrade(
         self,
+        stripe_service_mock: MagicMock,
         save_fixture: SaveFixture,
         session: AsyncSession,
         auth_subject: AuthSubject[User | Organization],
@@ -791,6 +792,9 @@ class TestCreate:
         product_recurring_free_price: Product,
         customer: Customer,
     ) -> None:
+        stripe_service_mock.create_customer_session.return_value = SimpleNamespace(
+            client_secret="STRIPE_CUSTOMER_SESSION_SECRET",
+        )
         subscription = await create_subscription(
             save_fixture, product=product_recurring_free_price, customer=customer
         )
@@ -811,6 +815,10 @@ class TestCreate:
         assert checkout.product_price == price
         assert checkout.product == product
         assert checkout.subscription == subscription
+        assert (
+            checkout.payment_processor_metadata["customer_session_client_secret"]
+            == "STRIPE_CUSTOMER_SESSION_SECRET"
+        )
 
     @pytest.mark.parametrize(
         "custom_field_data",
@@ -1150,12 +1158,17 @@ class TestCreate:
     )
     async def test_valid_customer(
         self,
+        stripe_service_mock: MagicMock,
         session: AsyncSession,
         auth_subject: AuthSubject[User | Organization],
         user_organization: UserOrganization,
         product_one_time: Product,
         customer: Customer,
     ) -> None:
+        stripe_service_mock.create_customer_session.return_value = SimpleNamespace(
+            client_secret="STRIPE_CUSTOMER_SESSION_SECRET",
+        )
+
         price = product_one_time.prices[0]
         assert isinstance(price, ProductPriceFixed)
 
@@ -1173,6 +1186,10 @@ class TestCreate:
         assert checkout.customer_name == customer.name
         assert checkout.customer_billing_address == customer.billing_address
         assert checkout.customer_tax_id == customer.tax_id
+        assert (
+            checkout.payment_processor_metadata["customer_session_client_secret"]
+            == "STRIPE_CUSTOMER_SESSION_SECRET"
+        )
 
     @pytest.mark.auth(
         AuthSubjectFixture(subject="user"),
@@ -1202,12 +1219,17 @@ class TestCreate:
     )
     async def test_existing_customer_external_id(
         self,
+        stripe_service_mock: MagicMock,
         session: AsyncSession,
         auth_subject: AuthSubject[User | Organization],
         user_organization: UserOrganization,
         product_one_time: Product,
         customer_external_id: Customer,
     ) -> None:
+        stripe_service_mock.create_customer_session.return_value = SimpleNamespace(
+            client_secret="STRIPE_CUSTOMER_SESSION_SECRET",
+        )
+
         checkout = await checkout_service.create(
             session,
             CheckoutProductsCreate(
@@ -1222,6 +1244,10 @@ class TestCreate:
         assert checkout.customer_name == customer_external_id.name
         assert checkout.customer_billing_address == customer_external_id.billing_address
         assert checkout.customer_tax_id == customer_external_id.tax_id
+        assert (
+            checkout.payment_processor_metadata["customer_session_client_secret"]
+            == "STRIPE_CUSTOMER_SESSION_SECRET"
+        )
 
     @pytest.mark.auth(
         AuthSubjectFixture(subject="user"),
@@ -2857,7 +2883,7 @@ class TestHandleStripeSuccess:
     async def test_not_succeeded_payment_intent(
         self, session: AsyncSession, checkout_confirmed_one_time: Checkout
     ) -> None:
-        with pytest.raises(PaymentIntentNotSucceeded):
+        with pytest.raises(IntentNotSucceeded):
             await checkout_service.handle_stripe_success(
                 session,
                 checkout_confirmed_one_time.id,
@@ -2867,7 +2893,7 @@ class TestHandleStripeSuccess:
     async def test_no_payment_method_on_payment_intent(
         self, session: AsyncSession, checkout_confirmed_one_time: Checkout
     ) -> None:
-        with pytest.raises(NoPaymentMethodOnPaymentIntent):
+        with pytest.raises(NoPaymentMethodOnIntent):
             await checkout_service.handle_stripe_success(
                 session,
                 checkout_confirmed_one_time.id,
@@ -2919,16 +2945,31 @@ class TestHandleStripeFailure:
                 build_stripe_payment_intent(),
             )
 
-    async def test_not_confirmed_checkout(
-        self, session: AsyncSession, checkout_one_time_fixed: Checkout
+    @pytest.mark.parametrize(
+        "status",
+        (
+            CheckoutStatus.expired,
+            CheckoutStatus.succeeded,
+            CheckoutStatus.failed,
+        ),
+    )
+    async def test_unrecoverable_status(
+        self,
+        status: CheckoutStatus,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        checkout_one_time_fixed: Checkout,
     ) -> None:
+        checkout_one_time_fixed.status = status
+        await save_fixture(checkout_one_time_fixed)
+
         checkout = await checkout_service.handle_stripe_failure(
             session,
             checkout_one_time_fixed.id,
             build_stripe_payment_intent(),
         )
 
-        assert checkout.status == CheckoutStatus.open
+        assert checkout.status == status
 
     async def test_valid(
         self, session: AsyncSession, checkout_confirmed_one_time: Checkout
@@ -2939,7 +2980,7 @@ class TestHandleStripeFailure:
             build_stripe_payment_intent(),
         )
 
-        assert checkout.status == CheckoutStatus.failed
+        assert checkout.status == CheckoutStatus.open
 
     async def test_valid_with_redemption(
         self,
@@ -2960,7 +3001,7 @@ class TestHandleStripeFailure:
             build_stripe_payment_intent(),
         )
 
-        assert checkout.status == CheckoutStatus.failed
+        assert checkout.status == CheckoutStatus.open
 
         discount_redemption_repository = DiscountRedemptionRepository.from_session(
             session

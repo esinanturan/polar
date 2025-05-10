@@ -14,10 +14,13 @@ from polar.billing_entry.service import billing_entry as billing_entry_service
 from polar.checkout.eventstream import CheckoutEvent, publish_checkout_event
 from polar.checkout.repository import CheckoutRepository
 from polar.config import settings
+from polar.customer_meter.service import customer_meter as customer_meter_service
 from polar.customer_session.service import customer_session as customer_session_service
 from polar.discount.service import discount as discount_service
 from polar.email.renderer import get_email_renderer
 from polar.email.sender import enqueue_email
+from polar.event.service import event as event_service
+from polar.event.system import SystemEvent, build_system_event
 from polar.exceptions import PolarError
 from polar.held_balance.service import held_balance as held_balance_service
 from polar.integrations.stripe.schemas import ProductType
@@ -39,6 +42,7 @@ from polar.models import (
     Product,
     ProductPrice,
     Subscription,
+    SubscriptionMeter,
     Transaction,
     User,
 )
@@ -426,8 +430,9 @@ class OrderService:
         subscription = await subscription_repository.get_by_stripe_subscription_id(
             stripe_subscription_id,
             options=(
-                joinedload(Subscription.product),
+                joinedload(Subscription.product).joinedload(Product.organization),
                 joinedload(Subscription.customer),
+                joinedload(Subscription.meters).joinedload(SubscriptionMeter.meter),
             ),
         )
         if subscription is None:
@@ -523,6 +528,17 @@ class OrderService:
         if len(pending_items) > 0:
             invoice = await stripe_service.get_invoice(invoice.id)
 
+        # Update statement descriptor
+        # Stripe doesn't allow to set statement descriptor on the subscription itself,
+        # so we need to set it manually on each new invoice.
+        assert invoice.id is not None
+        await stripe_service.update_invoice(
+            invoice.id,
+            statement_descriptor=subscription.organization.name[
+                : settings.stripe_descriptor_suffix_max_length
+            ],
+        )
+
         # Determine billing reason
         billing_reason = OrderBillingReason.subscription_cycle
         if invoice.billing_reason is not None:
@@ -578,6 +594,35 @@ class OrderService:
             ),
             flush=True,
         )
+
+        # Reset the associated meters, if any
+        for subscription_meter in subscription.meters:
+            rollover_units = await customer_meter_service.get_rollover_units(
+                session, customer, subscription_meter.meter
+            )
+            await event_service.create_event(
+                session,
+                build_system_event(
+                    SystemEvent.meter_reset,
+                    customer=customer,
+                    organization=subscription.organization,
+                    metadata={"meter_id": str(subscription_meter.meter_id)},
+                ),
+            )
+            if rollover_units > 0:
+                await event_service.create_event(
+                    session,
+                    build_system_event(
+                        SystemEvent.meter_credited,
+                        customer=customer,
+                        organization=subscription.organization,
+                        metadata={
+                            "meter_id": str(subscription_meter.meter_id),
+                            "units": rollover_units,
+                            "rollover": True,
+                        },
+                    ),
+                )
 
         await self._on_order_created(session, order)
 

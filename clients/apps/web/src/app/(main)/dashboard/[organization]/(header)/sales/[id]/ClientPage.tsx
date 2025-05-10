@@ -128,6 +128,7 @@ const ClientPage: React.FC<ClientPageProps> = ({
           customer={order.customer as schemas['Customer']}
         />
       }
+      contextViewClassName="bg-transparent dark:bg-transparent border-none rounded-none"
       wide
     >
       <ShadowBox className="dark:divide-polar-700 flex flex-col divide-y divide-gray-200 border-gray-200 bg-transparent p-0">
@@ -169,11 +170,16 @@ const ClientPage: React.FC<ClientPageProps> = ({
                 />
               </span>
             </DetailRow>
-            <DetailRow title="Billing Reason">
+            <DetailRow title="Status">
               <Status
-                status={order.billing_reason.split('_').join(' ')}
-                className="bg-emerald-100 capitalize text-emerald-500 dark:bg-emerald-950"
+                status={OrderStatusDisplayName[order.status]}
+                className={OrderStatusDisplayColor[order.status]}
               />
+            </DetailRow>
+            <DetailRow title="Billing Reason">
+              <span className="capitalize">
+                {order.billing_reason.split('_').join(' ')}
+              </span>
             </DetailRow>
 
             <Separator className="dark:bg-polar-700 my-4 h-[1px] bg-gray-300" />
