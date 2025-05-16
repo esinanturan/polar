@@ -394,9 +394,9 @@ class StripeService:
         return details
 
     async def update_invoice(
-        self, id: str, *, metadata: dict[str, str] | None = None
+        self, id: str, **params: Unpack[stripe_lib.Invoice.ModifyParams]
     ) -> stripe_lib.Invoice:
-        return await stripe_lib.Invoice.modify_async(id, metadata=metadata or {})
+        return await stripe_lib.Invoice.modify_async(id, **params)
 
     async def get_balance_transaction(self, id: str) -> stripe_lib.BalanceTransaction:
         return await stripe_lib.BalanceTransaction.retrieve_async(id)
@@ -837,6 +837,30 @@ class StripeService:
         self, payment_method_id: str
     ) -> stripe_lib.PaymentMethod:
         return await stripe_lib.PaymentMethod.detach_async(payment_method_id)
+
+    async def get_verification_session(
+        self, id: str
+    ) -> stripe_lib.identity.VerificationSession:
+        return await stripe_lib.identity.VerificationSession.retrieve_async(id)
+
+    async def create_verification_session(
+        self, user: User
+    ) -> stripe_lib.identity.VerificationSession:
+        return await stripe_lib.identity.VerificationSession.create_async(
+            type="document",
+            options={
+                "document": {
+                    "allowed_types": ["driving_license", "id_card", "passport"],
+                    "require_live_capture": True,
+                    "require_matching_selfie": True,
+                }
+            },
+            provided_details={
+                "email": user.email,
+            },
+            client_reference_id=str(user.id),
+            metadata={"user_id": str(user.id)},
+        )
 
 
 stripe = StripeService()

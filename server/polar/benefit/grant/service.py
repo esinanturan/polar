@@ -160,8 +160,8 @@ class BenefitGrantService(ResourceServiceReader[BenefitGrant]):
                 grant.properties,
                 attempt=attempt,
             )
-        except BenefitActionRequiredError:
-            grant.granted_at = None
+        except BenefitActionRequiredError as e:
+            grant.set_grant_failed(e)
         else:
             grant.properties = properties
             grant.set_granted()
@@ -326,7 +326,9 @@ class BenefitGrantService(ResourceServiceReader[BenefitGrant]):
 
         customer_repository = CustomerRepository.from_session(session)
         customer = await customer_repository.get_by_id(grant.customer_id)
-        assert customer is not None
+        # Deleted customer, don't update the grant
+        if customer is None:
+            return grant
 
         previous_properties = grant.properties
         benefit_strategy = get_benefit_strategy(benefit.type, session, redis)
@@ -338,8 +340,8 @@ class BenefitGrantService(ResourceServiceReader[BenefitGrant]):
                 update=True,
                 attempt=attempt,
             )
-        except BenefitActionRequiredError:
-            grant.granted_at = None
+        except BenefitActionRequiredError as e:
+            grant.set_grant_failed(e)
         else:
             grant.properties = properties
             grant.set_granted()
@@ -393,8 +395,8 @@ class BenefitGrantService(ResourceServiceReader[BenefitGrant]):
                 grant.properties,
                 attempt=attempt,
             )
-        except BenefitActionRequiredError:
-            grant.granted_at = None
+        except BenefitActionRequiredError as e:
+            grant.set_grant_failed(e)
         else:
             grant.properties = properties
 

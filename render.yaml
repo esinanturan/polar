@@ -79,12 +79,14 @@ services:
         fromRegistryCreds:
           name: Registry Credentials (by fvoron)
     plan: standard
-    dockerCommand: uv run supervisord -c supervisord.worker.conf
-    healthCheckPath: /healthz
+    dockerCommand: uv run dramatiq -p 2 -t 2 -f scheduler:start run_worker
+    healthCheckPath: /
     region: ohio
     numInstances: 1
     autoDeploy: false # deploys are triggered by github actions
     envVars:
+      - key: dramatiq_prom_port
+        value: 10000
       - key: POLAR_POSTGRES_DATABASE
         fromDatabase:
           name: db
@@ -206,12 +208,14 @@ services:
         fromRegistryCreds:
           name: Registry Credentials (by fvoron)
     plan: standard
-    dockerCommand: uv run supervisord -c supervisord.worker.conf
-    healthCheckPath: /healthz
+    dockerCommand: uv run dramatiq -p 2 -t 2 -f scheduler:start run_worker
+    healthCheckPath: /
     region: ohio
     numInstances: 1
     autoDeploy: false # deploys are triggered by github actions
     envVars:
+      - key: dramatiq_prom_port
+        value: 10000
       - key: POLAR_POSTGRES_DATABASE
         value: polar_sandbox
       - key: POLAR_POSTGRES_HOST
