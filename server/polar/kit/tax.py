@@ -2,8 +2,9 @@ import hashlib
 import json
 from collections.abc import Sequence
 from enum import StrEnum
-from typing import Annotated, Any, LiteralString
+from typing import Annotated, Any, Literal, LiteralString, Protocol, TypedDict
 
+import stdnum.ca.bn
 import stdnum.exceptions
 import stripe as stripe_lib
 from pydantic import Field
@@ -112,12 +113,12 @@ COUNTRY_TAX_ID_MAP: dict[str, Sequence[TaxIDFormat]] = {
     "BO": (TaxIDFormat.bo_tin,),
     "BR": (TaxIDFormat.br_cnpj, TaxIDFormat.br_cpf),
     "CA": (
-        TaxIDFormat.ca_bn,
         TaxIDFormat.ca_gst_hst,
         TaxIDFormat.ca_pst_bc,
         TaxIDFormat.ca_pst_mb,
         TaxIDFormat.ca_pst_sk,
         TaxIDFormat.ca_qst,
+        TaxIDFormat.ca_bn,
     ),
     "CH": (TaxIDFormat.ch_uid, TaxIDFormat.ch_vat),
     "CL": (TaxIDFormat.cl_tin,),
@@ -193,6 +194,58 @@ TaxID = Annotated[
 ]
 
 
+class TaxError(PolarError): ...
+
+
+class UnsupportedTaxIDFormat(TaxError):
+    def __init__(self, tax_id_type: TaxIDFormat) -> None:
+        self.tax_id_type = tax_id_type
+        super().__init__(f"Tax ID format {tax_id_type} is not supported.")
+
+
+class InvalidTaxID(TaxError):
+    def __init__(self, tax_id: str, country: str) -> None:
+        self.tax_id = tax_id
+        self.country = country
+        super().__init__("Invalid tax ID.")
+
+
+class ValidatorProtocol(Protocol):
+    def validate(self, number: str, country: str) -> str: ...
+
+
+class StdNumValidator(ValidatorProtocol):
+    def __init__(self, tax_id_type: TaxIDFormat):
+        tax_id_country, tax_id_format = tax_id_type.split("_", 1)
+        module = get_cc_module(tax_id_country, tax_id_format)
+        if module is None:
+            raise UnsupportedTaxIDFormat(tax_id_type)
+        self.module = module
+
+    def validate(self, number: str, country: str) -> str:
+        try:
+            return self.module.validate(number)
+        except stdnum.exceptions.ValidationError as e:
+            raise InvalidTaxID(number, country) from e
+
+
+class CAGSTHSTValidator(ValidatorProtocol):
+    def validate(self, number: str, country: str) -> str:
+        number = stdnum.ca.bn.compact(number)
+        if len(number) != 15:
+            raise InvalidTaxID(number, country)
+        try:
+            return stdnum.ca.bn.validate(number)
+        except stdnum.exceptions.ValidationError as e:
+            raise InvalidTaxID(number, country) from e
+
+
+def _get_validator(tax_id_type: TaxIDFormat) -> ValidatorProtocol:
+    if tax_id_type == TaxIDFormat.ca_gst_hst:
+        return CAGSTHSTValidator()
+    return StdNumValidator(tax_id_type)
+
+
 def validate_tax_id(number: str, country: str) -> TaxID:
     """
     Validate a tax ID for a given country.
@@ -205,24 +258,20 @@ def validate_tax_id(number: str, country: str) -> TaxID:
         The validated tax ID and the tax ID format as tuple
 
     Raises:
-        ValueError: The tax ID is invalid or unsupported.
+        InvalidTaxID: The tax ID is invalid or unsupported.
     """
     try:
         tax_id_types = COUNTRY_TAX_ID_MAP[country]
     except KeyError as e:
-        raise ValueError("Unsupported country.") from e
+        raise InvalidTaxID(number, country) from e
     else:
         for tax_id_type in tax_id_types:
-            tax_id_country, tax_id_format = tax_id_type.split("_", 1)
-            validation_module = get_cc_module(tax_id_country, tax_id_format)
-            if validation_module is None:
-                continue
             try:
-                validated_value = validation_module.validate(number)
-                return validated_value, tax_id_type
-            except stdnum.exceptions.ValidationError:
+                validator = _get_validator(tax_id_type)
+                return validator.validate(number, country), tax_id_type
+            except (UnsupportedTaxIDFormat, InvalidTaxID):
                 continue
-    raise ValueError("Invalid tax ID.")
+    raise InvalidTaxID(number, country)
 
 
 def to_stripe_tax_id(value: TaxID) -> stripe_lib.Customer.CreateParamsTaxIdDatum:
@@ -335,3 +384,67 @@ async def calculate_tax(
         raise InvalidTaxLocation(e) from e
     else:
         return calculation.tax_amount_exclusive
+
+
+class TaxabilityReason(StrEnum):
+    standard_rated = "standard_rated"
+    """Purchases that are subject to the standard rate of tax."""
+
+    not_collecting = "not_collecting"
+    """Purchases for countries where we don't collect tax."""
+
+    product_exempt = "product_exempt"
+    """Purchases for products that are exempt from tax."""
+
+    reverse_charge = "reverse_charge"
+    """Purchases where the customer is responsible for paying tax, e.g. B2B transactions with provided tax ID."""
+
+    not_subject_to_tax = "not_subject_to_tax"
+    """Purchases where the customer provided a tax ID, but on countries where we don't collect tax."""
+
+    not_supported = "not_supported"
+    """Purchases from countries where we don't support tax."""
+
+    @classmethod
+    def from_stripe(
+        cls, stripe_reason: str | None, tax_amount: int
+    ) -> "TaxabilityReason | None":
+        if stripe_reason is None or stripe_reason == "not_available":
+            # Stripe sometimes returns `None` or `not_available` even if taxes are collected.
+            if tax_amount != 0:
+                return TaxabilityReason.standard_rated
+            return None
+
+        return cls(stripe_reason)
+
+
+class TaxRate(TypedDict):
+    stripe_id: str
+    rate_type: Literal["percentage"] | Literal["fixed"]
+    basis_points: int | None
+    amount: int | None
+    amount_currency: str | None
+    display_name: str
+    country: str | None
+    state: str | None
+
+
+def from_stripe_tax_rate(tax_rate: stripe_lib.TaxRate) -> TaxRate:
+    rate_type = tax_rate.rate_type
+    if rate_type is None:
+        raise ValueError()
+
+    return {
+        "stripe_id": tax_rate.id,
+        "rate_type": "fixed" if rate_type == "flat_amount" else "percentage",
+        "basis_points": int(tax_rate.percentage * 100)
+        if tax_rate.percentage is not None
+        else None,
+        "amount": tax_rate.flat_amount.amount if tax_rate.flat_amount else None,
+        "amount_currency": tax_rate.flat_amount.currency
+        if tax_rate.flat_amount
+        else None,
+        "display_name": tax_rate.display_name,
+        "country": tax_rate.country,
+        "state": tax_rate.state,
+    }

@@ -131,10 +131,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
     )
 
     customer_id: Mapped[UUID] = mapped_column(
-        Uuid,
-        ForeignKey("customers.id", ondelete="cascade"),
-        nullable=False,
-        index=True,
+        Uuid, ForeignKey("customers.id", ondelete="cascade"), nullable=False, index=True
     )
 
     @declared_attr
@@ -255,7 +252,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
         )
 
     def can_cancel(self, immediately: bool = False) -> bool:
-        if not SubscriptionStatus.is_active(self.status):
+        if not SubscriptionStatus.is_billable(self.status):
             return False
 
         if self.ended_at:

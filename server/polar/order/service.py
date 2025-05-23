@@ -1,23 +1,26 @@
 import uuid
 from collections.abc import Sequence
 from datetime import UTC, datetime
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import stripe as stripe_lib
 import structlog
 from sqlalchemy import UnaryExpression, asc, desc, select
 from sqlalchemy.orm import contains_eager, joinedload
 
-from polar.account.service import account as account_service
+from polar.account.repository import AccountRepository
 from polar.auth.models import AuthSubject
 from polar.billing_entry.service import billing_entry as billing_entry_service
 from polar.checkout.eventstream import CheckoutEvent, publish_checkout_event
 from polar.checkout.repository import CheckoutRepository
 from polar.config import settings
+from polar.customer_meter.service import customer_meter as customer_meter_service
 from polar.customer_session.service import customer_session as customer_session_service
 from polar.discount.service import discount as discount_service
 from polar.email.renderer import get_email_renderer
 from polar.email.sender import enqueue_email
+from polar.event.service import event as event_service
+from polar.event.system import SystemEvent, build_system_event
 from polar.exceptions import PolarError
 from polar.held_balance.service import held_balance as held_balance_service
 from polar.integrations.stripe.schemas import ProductType
@@ -25,8 +28,10 @@ from polar.integrations.stripe.service import stripe as stripe_service
 from polar.integrations.stripe.utils import get_expandable_id
 from polar.kit.address import Address
 from polar.kit.db.postgres import AsyncSession
+from polar.kit.metadata import MetadataQuery, apply_metadata_clause
 from polar.kit.pagination import PaginationParams, paginate
 from polar.kit.sorting import Sorting
+from polar.kit.tax import TaxabilityReason, TaxRate, from_stripe_tax_rate
 from polar.logging import Logger
 from polar.models import (
     Checkout,
@@ -39,6 +44,7 @@ from polar.models import (
     Product,
     ProductPrice,
     Subscription,
+    SubscriptionMeter,
     Transaction,
     User,
 )
@@ -55,7 +61,7 @@ from polar.notifications.service import PartialNotification
 from polar.notifications.service import notifications as notifications_service
 from polar.order.repository import OrderRepository
 from polar.order.sorting import OrderSortProperty
-from polar.organization.service import organization as organization_service
+from polar.organization.repository import OrganizationRepository
 from polar.product.guard import is_custom_price, is_static_price
 from polar.product.repository import ProductPriceRepository
 from polar.subscription.repository import SubscriptionRepository
@@ -202,6 +208,7 @@ class OrderService:
         discount_id: Sequence[uuid.UUID] | None = None,
         customer_id: Sequence[uuid.UUID] | None = None,
         checkout_id: Sequence[uuid.UUID] | None = None,
+        metadata: MetadataQuery | None = None,
         pagination: PaginationParams,
         sorting: list[Sorting[OrderSortProperty]] = [
             (OrderSortProperty.created_at, True)
@@ -242,6 +249,9 @@ class OrderService:
 
         if checkout_id is not None:
             statement = statement.where(Order.checkout_id.in_(checkout_id))
+
+        if metadata is not None:
+            statement = apply_metadata_clause(Order, statement, metadata)
 
         order_by_clauses: list[UnaryExpression[Any]] = []
         for criterion, is_desc in sorting:
@@ -338,7 +348,7 @@ class OrderService:
             prices=list(price_id_map.values()),
             coupon=(checkout.discount.stripe_coupon_id if checkout.discount else None),
             # Disable automatic tax for free purchases, since we don't collect customer address in that case
-            automatic_tax=checkout.is_payment_required,
+            automatic_tax=checkout.is_payment_required and product.is_tax_applicable,
             metadata=metadata,
         )
 
@@ -360,16 +370,37 @@ class OrderService:
             for stripe_discount_amount in stripe_invoice.total_discount_amounts:
                 discount_amount += stripe_discount_amount.amount
 
+        # Retrieve tax data
+        tax_amount = stripe_invoice.tax or 0
+        taxability_reason: TaxabilityReason | None = None
+        tax_id = customer.tax_id
+        tax_rate: TaxRate | None = None
+        for total_tax_amount in stripe_invoice.total_tax_amounts:
+            taxability_reason = TaxabilityReason.from_stripe(
+                total_tax_amount.taxability_reason, tax_amount
+            )
+            stripe_tax_rate = cast(stripe_lib.TaxRate, total_tax_amount.tax_rate)
+            try:
+                tax_rate = from_stripe_tax_rate(stripe_tax_rate)
+            except ValueError:
+                continue
+            else:
+                break
+
         repository = OrderRepository.from_session(session)
         order = await repository.create(
             Order(
                 subtotal_amount=stripe_invoice.subtotal,
                 discount_amount=discount_amount,
-                tax_amount=stripe_invoice.tax or 0,
+                tax_amount=tax_amount,
                 currency=stripe_invoice.currency,
                 billing_reason=OrderBillingReason.purchase,
+                billing_name=customer.billing_name,
                 billing_address=customer.billing_address,
                 stripe_invoice_id=stripe_invoice.id,
+                taxability_reason=taxability_reason,
+                tax_id=tax_id,
+                tax_rate=tax_rate,
                 customer=customer,
                 product=product,
                 discount=checkout.discount,
@@ -426,8 +457,9 @@ class OrderService:
         subscription = await subscription_repository.get_by_stripe_subscription_id(
             stripe_subscription_id,
             options=(
-                joinedload(Subscription.product),
+                joinedload(Subscription.product).joinedload(Product.organization),
                 joinedload(Subscription.customer),
+                joinedload(Subscription.meters).joinedload(SubscriptionMeter.meter),
             ),
         )
         if subscription is None:
@@ -438,7 +470,9 @@ class OrderService:
 
         # Retrieve billing address
         billing_address: Address | None = None
-        if not _is_empty_customer_address(invoice.customer_address):
+        if customer.billing_address is not None:
+            billing_address = customer.billing_address
+        elif not _is_empty_customer_address(invoice.customer_address):
             billing_address = Address.model_validate(invoice.customer_address)
         # Try to retrieve the country from the payment method
         elif invoice.charge is not None:
@@ -523,6 +557,17 @@ class OrderService:
         if len(pending_items) > 0:
             invoice = await stripe_service.get_invoice(invoice.id)
 
+        # Update statement descriptor
+        # Stripe doesn't allow to set statement descriptor on the subscription itself,
+        # so we need to set it manually on each new invoice.
+        assert invoice.id is not None
+        await stripe_service.update_invoice(
+            invoice.id,
+            statement_descriptor=subscription.organization.name[
+                : settings.stripe_descriptor_suffix_max_length
+            ],
+        )
+
         # Determine billing reason
         billing_reason = OrderBillingReason.subscription_cycle
         if invoice.billing_reason is not None:
@@ -540,6 +585,25 @@ class OrderService:
         if invoice.total_discount_amounts:
             for stripe_discount_amount in invoice.total_discount_amounts:
                 discount_amount += stripe_discount_amount.amount
+
+        # Retrieve tax data
+        tax_amount = invoice.tax or 0
+        taxability_reason: TaxabilityReason | None = None
+        tax_id = customer.tax_id
+        tax_rate: TaxRate | None = None
+        for total_tax_amount in invoice.total_tax_amounts:
+            taxability_reason = TaxabilityReason.from_stripe(
+                total_tax_amount.taxability_reason, tax_amount
+            )
+            stripe_tax_rate = await stripe_service.get_tax_rate(
+                get_expandable_id(total_tax_amount.tax_rate)
+            )
+            try:
+                tax_rate = from_stripe_tax_rate(stripe_tax_rate)
+            except ValueError:
+                continue
+            else:
+                break
 
         # Ensure it inherits original metadata and custom fields
         user_metadata = (
@@ -561,11 +625,15 @@ class OrderService:
                 else OrderStatus.pending,
                 subtotal_amount=invoice.subtotal,
                 discount_amount=discount_amount,
-                tax_amount=invoice.tax or 0,
+                tax_amount=tax_amount,
                 currency=invoice.currency,
                 billing_reason=billing_reason,
+                billing_name=customer.billing_name,
                 billing_address=billing_address,
                 stripe_invoice_id=invoice.id,
+                taxability_reason=taxability_reason,
+                tax_id=tax_id,
+                tax_rate=tax_rate,
                 customer=customer,
                 product=subscription.product,
                 discount=discount,
@@ -578,6 +646,35 @@ class OrderService:
             ),
             flush=True,
         )
+
+        # Reset the associated meters, if any
+        for subscription_meter in subscription.meters:
+            rollover_units = await customer_meter_service.get_rollover_units(
+                session, customer, subscription_meter.meter
+            )
+            await event_service.create_event(
+                session,
+                build_system_event(
+                    SystemEvent.meter_reset,
+                    customer=customer,
+                    organization=subscription.organization,
+                    metadata={"meter_id": str(subscription_meter.meter_id)},
+                ),
+            )
+            if rollover_units > 0:
+                await event_service.create_event(
+                    session,
+                    build_system_event(
+                        SystemEvent.meter_credited,
+                        customer=customer,
+                        organization=subscription.organization,
+                        metadata={
+                            "meter_id": str(subscription_meter.meter_id),
+                            "units": rollover_units,
+                            "rollover": True,
+                        },
+                    ),
+                )
 
         await self._on_order_created(session, order)
 
@@ -701,7 +798,8 @@ class OrderService:
         self, session: AsyncSession, order: Order, charge_id: str
     ) -> None:
         organization = order.organization
-        account = await account_service.get_by_organization_id(session, organization.id)
+        account_repository = AccountRepository.from_session(session)
+        account = await account_repository.get_by_organization(organization.id)
 
         # Retrieve the payment transaction and link it to the order
         payment_transaction = await balance_transaction_service.get_by(
@@ -828,8 +926,9 @@ class OrderService:
     ) -> None:
         await session.refresh(order.product, {"prices"})
 
-        organization = await organization_service.get(
-            session, order.product.organization_id
+        organization_repository = OrganizationRepository.from_session(session)
+        organization = await organization_repository.get_by_id(
+            order.product.organization_id
         )
         if organization is not None:
             await webhook_service.send(session, organization, event_type, order)

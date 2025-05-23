@@ -132,15 +132,16 @@ class Checkout(CustomFieldDataMixin, MetadataMixin, RecordModel):
         return relationship(Discount, lazy="joined")
 
     customer_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey("customers.id", ondelete="set null"),
-        nullable=True,
+        Uuid, ForeignKey("customers.id", ondelete="set null"), nullable=True
     )
 
     @declared_attr
     def customer(cls) -> Mapped[Customer | None]:
         return relationship(Customer, lazy="raise")
 
+    is_business_customer: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
     customer_external_id: Mapped[str | None] = mapped_column(
         String, nullable=True, default=None
     )
@@ -152,6 +153,9 @@ class Checkout(CustomFieldDataMixin, MetadataMixin, RecordModel):
     )
     _customer_ip_address: Mapped[str | None] = mapped_column(
         "customer_ip_address", String, nullable=True, default=None
+    )
+    customer_billing_name: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None
     )
     customer_billing_address: Mapped[Address | None] = mapped_column(
         AddressType, nullable=True, default=None
