@@ -131,10 +131,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
     )
 
     customer_id: Mapped[UUID] = mapped_column(
-        Uuid,
-        ForeignKey("customers.id", ondelete="cascade"),
-        nullable=False,
-        index=True,
+        Uuid, ForeignKey("customers.id", ondelete="cascade"), nullable=False, index=True
     )
 
     @declared_attr
@@ -255,7 +252,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
         )
 
     def can_cancel(self, immediately: bool = False) -> bool:
-        if not SubscriptionStatus.is_active(self.status):
+        if not SubscriptionStatus.is_billable(self.status):
             return False
 
         if self.ended_at:
@@ -306,7 +303,11 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
             if is_metered_price(price.product_price)
         ]
         for price_meter in price_meters:
-            if self.get_meter(price_meter) is None:
+            try:
+                # Check if the meter already exists in the subscription
+                next(sm for sm in subscription_meters if sm.meter == price_meter)
+            except StopIteration:
+                # If it doesn't, create a new SubscriptionMeter
                 subscription_meters.append(SubscriptionMeter(meter=price_meter))
 
         # Remove old ones

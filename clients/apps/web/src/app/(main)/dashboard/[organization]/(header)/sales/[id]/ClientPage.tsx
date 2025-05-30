@@ -5,6 +5,9 @@ import CustomFieldValue from '@/components/CustomFields/CustomFieldValue'
 import { DashboardBody } from '@/components/Layout/DashboardLayout'
 import { InlineModal } from '@/components/Modal/InlineModal'
 import { useModal } from '@/components/Modal/useModal'
+import { DownloadInvoiceDashboard } from '@/components/Orders/DownloadInvoice'
+import PaymentMethod from '@/components/PaymentMethod/PaymentMethod'
+import PaymentStatus from '@/components/PaymentStatus/PaymentStatus'
 import { ProductThumbnail } from '@/components/Products/ProductThumbnail'
 import { RefundModal } from '@/components/Refunds/RefundModal'
 import {
@@ -14,6 +17,7 @@ import {
 } from '@/components/Refunds/utils'
 import { useCustomFields, useProduct } from '@/hooks/queries'
 import { useOrder } from '@/hooks/queries/orders'
+import { usePayments } from '@/hooks/queries/payments'
 import { useRefunds } from '@/hooks/queries/refunds'
 import { markdownOptionsJustText } from '@/utils/markdown'
 import { schemas } from '@polar-sh/client'
@@ -87,9 +91,13 @@ const ClientPage: React.FC<ClientPageProps> = ({
   organization,
   order: _order,
 }) => {
-  const { data: order } = useOrder(_order.id, _order)
+  const { data: order, refetch: refetchOrder } = useOrder(_order.id, _order)
   const { data: product } = useProduct(_order.product.id)
   const { data: customFields } = useCustomFields(organization.id)
+  const { data: payments, isLoading: paymentsLoading } = usePayments(
+    organization.id,
+    { order_id: _order.id },
+  )
   const { data: refunds, isLoading: refundsLoading } = useRefunds(_order.id)
 
   const {
@@ -128,6 +136,7 @@ const ClientPage: React.FC<ClientPageProps> = ({
           customer={order.customer as schemas['Customer']}
         />
       }
+      contextViewClassName="bg-transparent dark:bg-transparent border-none rounded-none"
       wide
     >
       <ShadowBox className="dark:divide-polar-700 flex flex-col divide-y divide-gray-200 border-gray-200 bg-transparent p-0">
@@ -154,7 +163,16 @@ const ClientPage: React.FC<ClientPageProps> = ({
           </div>
         </div>
         <div className="flex flex-col gap-6 p-8">
-          <h2 className="text-xl">Order Details</h2>
+          <div className="flex flex-row items-center justify-between">
+            <h2 className="text-xl">Order Details</h2>
+            {order.paid && (
+              <DownloadInvoiceDashboard
+                order={order}
+                organization={organization}
+                onInvoiceGenerated={refetchOrder}
+              />
+            )}
+          </div>
           <div className="flex flex-col gap-1">
             <DetailRow title="Order ID">
               <span className="dark:text-polar-500 font-mono text-sm text-gray-500">
@@ -169,11 +187,16 @@ const ClientPage: React.FC<ClientPageProps> = ({
                 />
               </span>
             </DetailRow>
-            <DetailRow title="Billing Reason">
+            <DetailRow title="Status">
               <Status
-                status={order.billing_reason.split('_').join(' ')}
-                className="bg-emerald-100 capitalize text-emerald-500 dark:bg-emerald-950"
+                status={OrderStatusDisplayName[order.status]}
+                className={OrderStatusDisplayColor[order.status]}
               />
+            </DetailRow>
+            <DetailRow title="Billing Reason">
+              <span className="capitalize">
+                {order.billing_reason.split('_').join(' ')}
+              </span>
             </DetailRow>
 
             <Separator className="dark:bg-polar-700 my-4 h-[1px] bg-gray-300" />
@@ -272,6 +295,50 @@ const ClientPage: React.FC<ClientPageProps> = ({
           </div>
         )}
       </ShadowBox>
+
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-row items-center justify-between gap-x-8">
+          <div className="flex flex-row items-center justify-between gap-x-6">
+            <h3 className="text-lg">Payment attempts</h3>
+          </div>
+        </div>
+
+        <DataTable
+          isLoading={paymentsLoading}
+          columns={[
+            {
+              accessorKey: 'created_at',
+              header: 'Created At',
+              cell: ({
+                row: {
+                  original: { created_at },
+                },
+              }) => (
+                <FormattedDateTime
+                  dateStyle="short"
+                  resolution="time"
+                  datetime={created_at}
+                />
+              ),
+            },
+            {
+              accessorKey: 'method',
+              header: 'Method',
+              cell: ({ row: { original } }) => (
+                <PaymentMethod payment={original} />
+              ),
+            },
+            {
+              accessorKey: 'status',
+              header: 'Status',
+              cell: ({ row: { original } }) => (
+                <PaymentStatus payment={original} />
+              ),
+            },
+          ]}
+          data={payments?.items ?? []}
+        />
+      </div>
 
       {order.paid && (
         <div className="flex flex-col gap-6">
