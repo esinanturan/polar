@@ -13,9 +13,11 @@ from sqlalchemy import (
     or_,
     select,
 )
+from sqlalchemy.orm import joinedload
 
 from polar.auth.models import AuthSubject, Organization, User, is_organization, is_user
 from polar.kit.repository import RepositoryBase, RepositoryIDMixin
+from polar.kit.repository.base import Options
 from polar.models import Customer, Event, Meter, UserOrganization
 from polar.models.event import EventSource
 
@@ -32,9 +34,27 @@ class EventRepository(RepositoryBase[Event], RepositoryIDMixin[Event, UUID]):
         return await self.get_all(statement)
 
     async def insert_batch(self, events: Sequence[dict[str, Any]]) -> Sequence[UUID]:
+        if not events:
+            return []
         statement = insert(Event).returning(Event.id)
         result = await self.session.execute(statement, events)
         return result.scalars().all()
+
+    async def get_latest_meter_reset(
+        self, customer: Customer, meter_id: UUID
+    ) -> Event | None:
+        statement = (
+            self.get_base_statement()
+            .where(
+                Event.customer == customer,
+                Event.source == EventSource.system,
+                Event.name == SystemEvent.meter_reset,
+                Event.user_metadata["meter_id"].as_string() == str(meter_id),
+            )
+            .order_by(Event.timestamp.desc())
+            .limit(1)
+        )
+        return await self.get_one_or_none(statement)
 
     def get_event_names_statement(
         self, auth_subject: AuthSubject[User | Organization]
@@ -103,11 +123,11 @@ class EventRepository(RepositoryBase[Event], RepositoryIDMixin[Event, UUID]):
             meter.aggregation.get_sql_clause(Event),
         )
 
-    def get_meter_credit_clause(self, meter: Meter) -> ColumnExpressionArgument[bool]:
+    def get_meter_system_clause(self, meter: Meter) -> ColumnExpressionArgument[bool]:
         return and_(
             Event.source == EventSource.system,
-            Event.name.in_((SystemEvent.meter_credited,)),
-            Event.user_metadata["meter_id"].astext == str(meter.id),
+            Event.name.in_((SystemEvent.meter_credited, SystemEvent.meter_reset)),
+            Event.user_metadata["meter_id"].as_string() == str(meter.id),
         )
 
     def get_meter_statement(self, meter: Meter) -> Select[tuple[Event]]:
@@ -115,3 +135,6 @@ class EventRepository(RepositoryBase[Event], RepositoryIDMixin[Event, UUID]):
             Event.organization_id == meter.organization_id,
             self.get_meter_clause(meter),
         )
+
+    def get_eager_options(self) -> Options:
+        return (joinedload(Event.customer),)

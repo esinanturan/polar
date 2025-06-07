@@ -35,6 +35,8 @@ from polar.organization.endpoints import router as organization_router
 from polar.organization_access_token.endpoints import (
     router as organization_access_token_router,
 )
+from polar.payment.endpoints import router as payment_router
+from polar.payout.endpoints import router as payout_router
 from polar.personal_access_token.endpoints import router as pat_router
 from polar.product.endpoints import router as product_router
 from polar.refund.endpoints import router as refund_router
@@ -124,3 +126,7 @@ router.include_router(meter_router)
 router.include_router(organization_access_token_router)
 # /customer-meters
 router.include_router(customer_meter_router)
+# /payments
+router.include_router(payment_router)
+# /payouts
+router.include_router(payout_router)
