@@ -24,9 +24,7 @@ OrderNotFound = {
 }
 
 
-class OrderBase(
-    CustomFieldDataOutputMixin, MetadataOutputMixin, IDSchema, TimestampedSchema
-):
+class OrderBase(TimestampedSchema, IDSchema):
     status: OrderStatus = Field(examples=["paid"])
     paid: bool = Field(
         description="Whether the order has been paid for.", examples=[True]
@@ -52,7 +50,13 @@ class OrderBase(
     refunded_tax_amount: int = Field(description="Sales tax refunded in cents.")
     currency: str
     billing_reason: OrderBillingReason
+    billing_name: str | None = Field(
+        description="The name of the customer that should appear on the invoice. "
+    )
     billing_address: Address | None
+    is_invoice_generated: bool = Field(
+        description="Whether an invoice has been generated for this order."
+    )
 
     customer_id: UUID4
     product_id: UUID4
@@ -143,7 +147,7 @@ class OrderItemSchema(IDSchema, TimestampedSchema):
     product_price_id: UUID4 | None = Field(description="Associated price ID, if any.")
 
 
-class Order(OrderBase):
+class Order(CustomFieldDataOutputMixin, MetadataOutputMixin, OrderBase):
     customer: OrderCustomer
     user_id: UUID4 = Field(
         validation_alias=AliasChoices(
@@ -176,6 +180,25 @@ class Order(OrderBase):
     discount: OrderDiscount | None
     subscription: OrderSubscription | None
     items: list[OrderItemSchema] = Field(description="Line items composing the order.")
+
+
+class OrderUpdateBase(Schema):
+    billing_name: str | None = Field(
+        description=(
+            "The name of the customer that should appear on the invoice. "
+            "Can't be updated after the invoice is generated."
+        )
+    )
+    billing_address: Address | None = Field(
+        description=(
+            "The address of the customer that should appear on the invoice. "
+            "Can't be updated after the invoice is generated."
+        )
+    )
+
+
+class OrderUpdate(OrderUpdateBase):
+    """Schema to update an order."""
 
 
 class OrderInvoice(Schema):

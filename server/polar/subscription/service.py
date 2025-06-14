@@ -19,6 +19,8 @@ from polar.billing_entry.service import billing_entry as billing_entry_service
 from polar.checkout.eventstream import CheckoutEvent, publish_checkout_event
 from polar.config import settings
 from polar.customer_session.service import customer_session as customer_session_service
+from polar.discount.repository import DiscountRedemptionRepository
+from polar.discount.service import discount as discount_service
 from polar.email.renderer import get_email_renderer
 from polar.email.sender import enqueue_email, get_email_sender
 from polar.enums import SubscriptionProrationBehavior, SubscriptionRecurringInterval
@@ -32,6 +34,7 @@ from polar.integrations.stripe.schemas import ProductType
 from polar.integrations.stripe.service import stripe as stripe_service
 from polar.integrations.stripe.utils import get_expandable_id
 from polar.kit.db.postgres import AsyncSession
+from polar.kit.metadata import MetadataQuery, apply_metadata_clause
 from polar.kit.pagination import PaginationParams, paginate
 from polar.kit.services import ResourceServiceReader
 from polar.kit.sorting import Sorting
@@ -61,7 +64,7 @@ from polar.notifications.notification import (
 )
 from polar.notifications.service import PartialNotification
 from polar.notifications.service import notifications as notifications_service
-from polar.organization.service import organization as organization_service
+from polar.organization.repository import OrganizationRepository
 from polar.postgres import sql
 from polar.product.guard import (
     is_custom_price,
@@ -72,12 +75,12 @@ from polar.product.repository import ProductRepository
 from polar.webhook.service import webhook as webhook_service
 from polar.worker import enqueue_job
 
-from ..product.service.product import product as product_service
 from .repository import SubscriptionRepository
 from .schemas import (
     SubscriptionCancel,
     SubscriptionRevoke,
     SubscriptionUpdate,
+    SubscriptionUpdateDiscount,
     SubscriptionUpdateProduct,
 )
 
@@ -211,6 +214,7 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         customer_id: Sequence[uuid.UUID] | None = None,
         discount_id: Sequence[uuid.UUID] | None = None,
         active: bool | None = None,
+        metadata: MetadataQuery | None = None,
         pagination: PaginationParams,
         sorting: list[Sorting[SubscriptionSortProperty]] = [
             (SubscriptionSortProperty.started_at, True)
@@ -241,6 +245,9 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
                 statement = statement.where(Subscription.active.is_(True))
             else:
                 statement = statement.where(Subscription.revoked.is_(True))
+
+        if metadata is not None:
+            statement = apply_metadata_clause(Subscription, statement, metadata)
 
         order_by_clauses: list[UnaryExpression[Any]] = []
         for criterion, is_desc in sorting:
@@ -331,8 +338,11 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         self,
         session: AsyncSession,
         checkout: Checkout,
-        payment_intent: stripe_lib.PaymentIntent | None,
+        intent: stripe_lib.PaymentIntent | stripe_lib.SetupIntent | None,
     ) -> Subscription:
+        idempotency_key = (
+            f"subscription_{checkout.id}{'' if intent is None else f'_{intent.id}'}"
+        )
         product = checkout.product
         if not product.is_recurring:
             raise NotARecurringProduct(checkout, product)
@@ -346,8 +356,8 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
             raise MissingStripeCustomerID(checkout, customer)
 
         stripe_payment_method_id = (
-            get_expandable_id(payment_intent.payment_method)
-            if payment_intent and payment_intent.payment_method
+            get_expandable_id(intent.payment_method)
+            if intent and intent.payment_method
             else None
         )
         metadata = {
@@ -358,8 +368,8 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         invoice_metadata = {
             "checkout_id": str(checkout.id),
         }
-        if payment_intent is not None:
-            invoice_metadata["payment_intent_id"] = payment_intent.id
+        if intent is not None and isinstance(intent, stripe_lib.PaymentIntent):
+            invoice_metadata["payment_intent_id"] = intent.id
 
         stripe_price_ids: list[str] = []
         subscription_product_prices: list[SubscriptionProductPrice] = []
@@ -373,7 +383,11 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
             # For pay-what-you-want prices, we need to generate a dedicated price in Stripe
             if is_custom_price(price):
                 ad_hoc_price = await stripe_service.create_ad_hoc_custom_price(
-                    product, price, amount=checkout.amount, currency=checkout.currency
+                    product,
+                    price,
+                    amount=checkout.amount,
+                    currency=checkout.currency,
+                    idempotency_key=f"{idempotency_key}_{price.id}",
                 )
                 stripe_price_ids.append(ad_hoc_price.id)
                 subscription_product_prices.append(
@@ -392,7 +406,9 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         # It happens if we only have metered prices on the product
         if len(stripe_price_ids) == 0:
             placeholder_price = await stripe_service.create_placeholder_price(
-                product, checkout.currency
+                product,
+                checkout.currency,
+                idempotency_key=f"{idempotency_key}_placeholder",
             )
             stripe_price_ids.append(placeholder_price.id)
 
@@ -420,6 +436,7 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
                 automatic_tax=automatic_tax,
                 metadata=metadata,
                 invoice_metadata=invoice_metadata,
+                idempotency_key=f"{idempotency_key}_create",
             )
             subscription = Subscription()
             new_subscription = True
@@ -438,10 +455,12 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
                 automatic_tax=automatic_tax,
                 metadata=metadata,
                 invoice_metadata=invoice_metadata,
+                idempotency_key=f"{idempotency_key}_update",
             )
         await stripe_service.set_automatically_charged_subscription(
             stripe_subscription.id,
             stripe_payment_method_id,
+            idempotency_key=f"{idempotency_key}_payment_method",
         )
 
         subscription.stripe_subscription_id = stripe_subscription.id
@@ -482,6 +501,15 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
                 previous_ends_at=previous_ends_at,
             )
 
+        # Link potential discount redemption to the subscription
+        if subscription.discount is not None:
+            discount_redemption_repository = DiscountRedemptionRepository.from_session(
+                session
+            )
+            await discount_redemption_repository.set_subscription_by_checkout(
+                checkout.id, subscription.id
+            )
+
         # Notify checkout channel that a subscription has been created from it
         await publish_checkout_event(
             checkout.client_secret, CheckoutEvent.subscription_created
@@ -489,12 +517,15 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
 
         # Sanity check to make sure we didn't mess up the amount.
         # Don't raise an error so the order can be successfully completed nonetheless.
-        if payment_intent and stripe_invoice.total != payment_intent.amount:
+        if (
+            isinstance(intent, stripe_lib.PaymentIntent)
+            and stripe_invoice.total != intent.amount
+        ):
             log.error(
                 "Mismatch between payment intent and invoice amount",
                 subscription=subscription.id,
                 checkout=checkout.id,
-                payment_intent=payment_intent.id,
+                payment_intent=intent.id,
                 invoice=stripe_invoice.id,
             )
 
@@ -541,6 +572,14 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
                     subscription,
                     product_id=update.product_id,
                     proration_behavior=update.proration_behavior,
+                )
+
+            if isinstance(update, SubscriptionUpdateDiscount):
+                return await self.update_discount(
+                    session,
+                    locker,
+                    subscription,
+                    discount_id=update.discount_id,
                 )
 
             if isinstance(update, SubscriptionCancel):
@@ -655,8 +694,9 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         subscription.recurring_interval = product.recurring_interval
 
         if proration_behavior is None:
-            organization = await organization_service.get(
-                session, product.organization_id
+            organization_repository = OrganizationRepository.from_session(session)
+            organization = await organization_repository.get_by_id(
+                product.organization_id
             )
             assert organization is not None
             proration_behavior = organization.proration_behavior
@@ -675,6 +715,81 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
 
         session.add(subscription)
         return subscription
+
+    async def update_discount(
+        self,
+        session: AsyncSession,
+        locker: Locker,
+        subscription: Subscription,
+        *,
+        discount_id: uuid.UUID | None = None,
+    ) -> Subscription:
+        discount: Discount | None = None
+
+        if discount_id is not None:
+            discount = await discount_service.get_by_id_and_organization(
+                session,
+                discount_id,
+                subscription.organization,
+                products=[subscription.product],
+            )
+            if discount is None:
+                raise PolarRequestValidationError(
+                    [
+                        {
+                            "type": "value_error",
+                            "loc": ("body", "discount_id"),
+                            "msg": (
+                                "Discount does not exist, "
+                                "is not applicable to this product "
+                                "or is not redeemable."
+                            ),
+                            "input": discount_id,
+                        }
+                    ]
+                )
+            if discount == subscription.discount:
+                raise PolarRequestValidationError(
+                    [
+                        {
+                            "type": "value_error",
+                            "loc": ("body", "discount_id"),
+                            "msg": "This discount is already applied to the subscription.",
+                            "input": discount_id,
+                        }
+                    ]
+                )
+
+        async def _update_discount(
+            session: AsyncSession,
+            subscription: Subscription,
+            discount: Discount | None,
+        ) -> Subscription:
+            if subscription.stripe_subscription_id is not None:
+                old_coupon_id = (
+                    subscription.discount.stripe_coupon_id
+                    if subscription.discount is not None
+                    else None
+                )
+                new_coupon_id = (
+                    discount.stripe_coupon_id if discount is not None else None
+                )
+                await stripe_service.update_subscription_discount(
+                    subscription.stripe_subscription_id, old_coupon_id, new_coupon_id
+                )
+            repository = SubscriptionRepository.from_session(session)
+            return await repository.update(
+                subscription, update_dict={"discount": discount}, flush=True
+            )
+
+        if discount is None:
+            return await _update_discount(session, subscription, None)
+
+        async with discount_service.redeem_discount(
+            session, locker, discount
+        ) as discount_redemption:
+            discount_redemption.subscription = subscription
+            return await _update_discount(session, subscription, discount)
 
     async def uncancel(
         self,
@@ -1064,18 +1179,20 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         full_subscription = await self.get(session, subscription.id)
         assert full_subscription
 
-        if tier := await product_service.get_loaded(session, subscription.product_id):
-            if subscribed_to_org := await organization_service.get(
-                session, tier.organization_id
-            ):
-                await webhook_service.send(
-                    session, subscribed_to_org, event_type, full_subscription
-                )
+        product_repository = ProductRepository.from_session(session)
+        product = await product_repository.get_by_id(
+            subscription.product_id, options=product_repository.get_eager_options()
+        )
+        if product is not None:
+            await webhook_service.send(
+                session, product.organization, event_type, full_subscription
+            )
 
     async def enqueue_benefits_grants(
         self, session: AsyncSession, subscription: Subscription
     ) -> None:
-        product = await product_service.get(session, subscription.product_id)
+        product_repository = ProductRepository.from_session(session)
+        product = await product_repository.get_by_id(subscription.product_id)
         assert product is not None
 
         if subscription.is_incomplete():
@@ -1153,14 +1270,14 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
         email_sender = get_email_sender()
 
         product = subscription.product
-        featured_organization = await organization_service.get(
-            session,
+        organization_repository = OrganizationRepository.from_session(session)
+        featured_organization = await organization_repository.get_by_id(
             product.organization_id,
             # We block organizations in case of fraud and then refund/cancel
             # so make sure we can still fetch them for the purpose of sending
             # customer emails.
-            allow_blocked=True,
-            allow_deleted=True,
+            include_deleted=True,
+            include_blocked=True,
         )
         assert featured_organization is not None
 
@@ -1205,6 +1322,7 @@ class SubscriptionService(ResourceServiceReader[Subscription]):
             query = query.options(
                 joinedload(Subscription.customer),
                 joinedload(Subscription.product).options(
+                    joinedload(Product.organization),
                     selectinload(Product.product_medias),
                     selectinload(Product.attached_custom_fields),
                 ),

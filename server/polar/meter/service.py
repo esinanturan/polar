@@ -6,6 +6,7 @@ from typing import Any
 from sqlalchemy import (
     ColumnElement,
     ColumnExpressionArgument,
+    Select,
     UnaryExpression,
     and_,
     asc,
@@ -257,14 +258,16 @@ class MeterService:
             event_repository.get_base_statement()
             .where(
                 Event.organization_id == meter.organization_id,
+                Event.customer.is_not(None),
                 or_(
                     # Events matching meter definitions
                     event_repository.get_meter_clause(meter),
                     # System events impacting the meter balance
-                    event_repository.get_meter_credit_clause(meter),
+                    event_repository.get_meter_system_clause(meter),
                 ),
             )
             .order_by(Event.ingested_at.asc())
+            .options(*event_repository.get_eager_options())
         )
         last_billed_event = meter.last_billed_event
         if last_billed_event is not None:
@@ -317,11 +320,14 @@ class MeterService:
         return entries
 
     async def get_quantity(
-        self, session: AsyncSession, meter: Meter, events: Sequence[uuid.UUID]
+        self,
+        session: AsyncSession,
+        meter: Meter,
+        events_statement: Select[tuple[uuid.UUID]],
     ) -> float:
         statement = select(
             func.coalesce(meter.aggregation.get_sql_column(Event), 0)
-        ).where(Event.id.in_(events))
+        ).where(Event.id.in_(events_statement))
         result = await session.scalar(statement)
         return result or 0.0
 
