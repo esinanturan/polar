@@ -165,6 +165,7 @@ def construct_stripe_invoice(
     tax = sum(line["tax_amount"] for line in lines)
     subtotal = sum(line["amount"] for line in lines)
     total = subtotal - (discount_amount or 0) + tax
+
     return stripe_lib.Invoice.construct_from(
         {
             "id": id,
@@ -210,6 +211,23 @@ def construct_stripe_invoice(
             "total_discount_amounts": [{"amount": discount_amount}]
             if discount_amount is not None
             else None,
+            "total_tax_amounts": [
+                {
+                    "amount": tax,
+                    "taxability_reason": "standard_rated"
+                    if tax > 0
+                    else "not_collecting",
+                    "tax_rate": {
+                        "id": "STRIPE_TAX_RATE_ID",
+                        "rate_type": "percentage",
+                        "percentage": 20.0,
+                        "flat_amount": None,
+                        "display_name": "VAT",
+                        "country": "FR",
+                        "state": None,
+                    },
+                }
+            ],
             "created": created or int(time.time()),
         },
         None,
@@ -245,6 +263,7 @@ def build_stripe_invoice(
 
 def build_stripe_charge(
     *,
+    status: str = "succeeded",
     amount: int = 1000,
     customer: str | None = None,
     invoice: str | None = None,
@@ -253,12 +272,14 @@ def build_stripe_charge(
     type: ProductType | None = None,
     amount_refunded: int = 0,
     metadata: dict[str, str] | None = None,
-    risk_level: str | None = None,
-    risk_score: int | None = None,
+    billing_details: dict[str, Any] | None = None,
+    payment_method_details: dict[str, Any] | None = None,
+    outcome: dict[str, Any] | None = None,
 ) -> stripe_lib.Charge:
     metadata = metadata or {}
     obj: dict[str, Any] = {
         "id": "STRIPE_CHARGE_ID",
+        "status": status,
         "customer": customer,
         "currency": "usd",
         "amount": amount,
@@ -267,12 +288,15 @@ def build_stripe_charge(
         "balance_transaction": balance_transaction,
         "amount_refunded": amount_refunded,
         "metadata": {"type": type, **metadata} if type is not None else metadata,
+        "billing_details": billing_details,
+        "payment_method_details": payment_method_details,
+        "outcome": {
+            "reason": None,
+            "risk_level": "normal",
+            "risk_score": 0,
+            **(outcome or {}),
+        },
     }
-    if risk_level or risk_score:
-        obj["outcome"] = {
-            "risk_level": risk_level if risk_level else "normal",
-            "risk_score": risk_score if risk_score else 0,
-        }
 
     return stripe_lib.Charge.construct_from(obj, None)
 

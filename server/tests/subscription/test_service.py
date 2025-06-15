@@ -1,3 +1,4 @@
+import uuid
 from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
@@ -13,9 +14,14 @@ from sqlalchemy.util.typing import TypeAlias
 from polar.auth.models import AuthSubject
 from polar.checkout.eventstream import CheckoutEvent
 from polar.enums import SubscriptionRecurringInterval
-from polar.exceptions import BadRequest, ResourceUnavailable
+from polar.exceptions import (
+    BadRequest,
+    PolarRequestValidationError,
+    ResourceUnavailable,
+)
 from polar.integrations.stripe.service import StripeService
 from polar.kit.pagination import PaginationParams
+from polar.locker import Locker
 from polar.meter.aggregation import AggregationFunction, PropertyAggregation
 from polar.meter.filter import Filter, FilterConjunction
 from polar.models import (
@@ -1196,6 +1202,180 @@ class TestList:
 
         assert len(results) == 1
         assert count == 1
+
+    @pytest.mark.auth
+    async def test_metadata_filter(
+        self,
+        auth_subject: AuthSubject[Organization],
+        session: AsyncSession,
+        save_fixture: SaveFixture,
+        user_organization: UserOrganization,
+        product: Product,
+        customer: Customer,
+    ) -> None:
+        subscription_1 = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "ABC"},
+        )
+        subscription_2 = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "DEF"},
+        )
+        await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "GHI"},
+        )
+
+        # then
+        session.expunge_all()
+
+        results, count = await subscription_service.list(
+            session,
+            auth_subject,
+            pagination=PaginationParams(1, 10),
+            metadata={"reference_id": ["ABC", "DEF"]},
+        )
+
+        assert len(results) == 2
+        assert count == 2
+
+        assert subscription_1 in results
+        assert subscription_2 in results
+
+
+@pytest.mark.asyncio
+class TestUpdateDiscount:
+    async def test_not_existing_discount(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        with pytest.raises(PolarRequestValidationError):
+            await subscription_service.update_discount(
+                session, locker, subscription, discount_id=uuid.uuid4()
+            )
+
+    async def test_same_discount(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        discount_percentage_100: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        with pytest.raises(PolarRequestValidationError):
+            await subscription_service.update_discount(
+                session, locker, subscription, discount_id=discount_percentage_50.id
+            )
+
+    async def test_valid_removed(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=None
+        )
+
+        assert subscription.discount is None
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            discount_percentage_50.stripe_coupon_id,
+            None,
+        )
+
+    async def test_valid_added(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture, product=product, customer=customer
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=discount_percentage_50.id
+        )
+
+        assert subscription.discount == discount_percentage_50
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            None,
+            discount_percentage_50.stripe_coupon_id,
+        )
+
+    async def test_valid_modified(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        discount_percentage_100: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=discount_percentage_100.id
+        )
+
+        assert subscription.discount == discount_percentage_100
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            discount_percentage_50.stripe_coupon_id,
+            discount_percentage_100.stripe_coupon_id,
+        )
 
 
 @pytest.mark.asyncio

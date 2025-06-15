@@ -6,6 +6,7 @@ from sqlalchemy import (
     TIMESTAMP,
     ColumnElement,
     ForeignKey,
+    Integer,
     String,
     UniqueConstraint,
     Uuid,
@@ -73,10 +74,13 @@ class Organization(RecordModel):
         TIMESTAMP(timezone=True)
     )
 
+    customer_invoice_prefix: Mapped[str] = mapped_column(String, nullable=False)
+    customer_invoice_next_number: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1
+    )
+
     account_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey("accounts.id", ondelete="set null"),
-        nullable=True,
+        Uuid, ForeignKey("accounts.id", ondelete="set null"), nullable=True
     )
 
     @declared_attr
