@@ -4,6 +4,7 @@ from typing import Any
 
 from sqlalchemy import UnaryExpression, asc, desc, func, or_
 from sqlalchemy.orm import joinedload
+from sqlalchemy_utils.types.range import timedelta
 from stripe import Customer as StripeCustomer
 
 from polar.auth.models import AuthSubject
@@ -22,12 +23,13 @@ from polar.models import (
 from polar.models.webhook_endpoint import CustomerWebhookEventType, WebhookEventType
 from polar.organization.resolver import get_payload_organization
 from polar.postgres import AsyncSession
+from polar.redis import Redis
 from polar.subscription.repository import SubscriptionRepository
 from polar.webhook.service import webhook as webhook_service
 from polar.worker import enqueue_job
 
 from .repository import CustomerRepository
-from .schemas.customer import CustomerCreate, CustomerUpdate
+from .schemas.customer import CustomerCreate, CustomerUpdate, CustomerUpdateExternalID
 from .schemas.state import CustomerState
 from .sorting import CustomerSortProperty
 
@@ -154,7 +156,10 @@ class CustomerService:
         return await repository.create(customer)
 
     async def update(
-        self, session: AsyncSession, customer: Customer, customer_update: CustomerUpdate
+        self,
+        session: AsyncSession,
+        customer: Customer,
+        customer_update: CustomerUpdate | CustomerUpdateExternalID,
     ) -> Customer:
         repository = CustomerRepository.from_session(session)
 
@@ -180,8 +185,10 @@ class CustomerService:
             customer.email_verified = False
 
         if (
-            "external_id" in customer_update.model_fields_set
+            isinstance(customer_update, CustomerUpdate)
+            and "external_id" in customer_update.model_fields_set
             and customer.external_id is not None
+            and customer.external_id != customer_update.external_id
         ):
             errors.append(
                 {
@@ -192,7 +199,11 @@ class CustomerService:
                 }
             )
 
-        if customer_update.external_id is not None:
+        if (
+            isinstance(customer_update, CustomerUpdate)
+            and customer_update.external_id is not None
+            and customer.external_id != customer_update.external_id
+        ):
             if await repository.get_by_external_id_and_organization(
                 customer_update.external_id, customer.organization_id
             ):
@@ -221,8 +232,22 @@ class CustomerService:
         return await repository.soft_delete(customer)
 
     async def get_state(
-        self, session: AsyncSession, customer: Customer
+        self,
+        session: AsyncSession,
+        redis: Redis,
+        customer: Customer,
+        cache: bool = True,
     ) -> CustomerState:
+        # 👋 Whenever you change the state schema,
+        # please also update the cache key with a version number.
+        cache_key = f"polar:customer_state:v2:{customer.id}"
+
+        if cache:
+            raw_state = await redis.get(cache_key)
+            if raw_state is not None:
+                return CustomerState.model_validate_json(raw_state)
+
+        # If not cached, fetch from the database
         subscription_repository = SubscriptionRepository.from_session(session)
         customer.active_subscriptions = (
             await subscription_repository.list_active_by_customer(customer.id)
@@ -240,7 +265,15 @@ class CustomerService:
             customer.id
         )
 
-        return CustomerState.model_validate(customer)
+        state = CustomerState.model_validate(customer)
+
+        await redis.set(
+            cache_key,
+            state.model_dump_json(),
+            ex=int(timedelta(hours=1).total_seconds()),
+        )
+
+        return state
 
     async def get_or_create_from_stripe_customer(
         self,
@@ -292,12 +325,13 @@ class CustomerService:
     async def webhook(
         self,
         session: AsyncSession,
+        redis: Redis,
         event_type: CustomerWebhookEventType,
         customer: Customer,
     ) -> None:
         data: CustomerState | Customer
         if event_type == WebhookEventType.customer_state_changed:
-            data = await self.get_state(session, customer)
+            data = await self.get_state(session, redis, customer, cache=False)
             await webhook_service.send(
                 session,
                 customer.organization,
@@ -317,7 +351,7 @@ class CustomerService:
             WebhookEventType.customer_deleted,
         ):
             await self.webhook(
-                session, WebhookEventType.customer_state_changed, customer
+                session, redis, WebhookEventType.customer_state_changed, customer
             )
 
 

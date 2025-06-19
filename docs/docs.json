@@ -7,9 +7,9 @@
   "name": "Polar",
   "description": "Payments & Billing with 6 lines of code. Open Source & Global Merchant of Record.",
   "colors": {
-    "primary": "#0062FF",
-    "light": "#3381FF",
-    "dark": "#0054DB"
+    "primary": "#000",
+    "light": "#fff",
+    "dark": "#000"
   },
   "background": {
     "color": {
@@ -59,6 +59,7 @@
                   "features/benefits/file-downloads",
                   "features/benefits/discord-access",
                   "features/benefits/github-access",
+                  "features/benefits/credits",
                   "features/benefits/custom"
                 ]
               },
@@ -70,6 +71,7 @@
                   "features/checkout/session"
                 ]
               },
+              "features/custom-fields",
               "features/discounts",
               "features/orders",
               "features/refunds",
@@ -91,7 +93,8 @@
                   "features/integrations/framer",
                   "features/integrations/zapier",
                   "features/integrations/paritydeals",
-                  "features/integrations/affonso"
+                  "features/integrations/affonso",
+                  "features/integrations/fernand"
                 ]
               }
             ]
@@ -169,6 +172,10 @@
         "icon": "rectangle-terminal",
         "groups": [
           {
+            "group": "General",
+            "pages": ["api-reference/rate-limits"]
+          },
+          {
             "group": "Core API",
             "pages": [
               {
@@ -231,7 +238,9 @@
                 "group": "Orders",
                 "pages": [
                   "api-reference/orders/get",
+                  "api-reference/orders/patch",
                   "api-reference/orders/list",
+                  "api-reference/orders/post-invoice",
                   "api-reference/orders/get-invoice"
                 ]
               },
@@ -357,7 +366,9 @@
                 "group": "Orders",
                 "pages": [
                   "api-reference/customer-portal/orders/get",
+                  "api-reference/customer-portal/orders/patch",
                   "api-reference/customer-portal/orders/list",
+                  "api-reference/customer-portal/orders/post-invoice",
                   "api-reference/customer-portal/orders/get-invoice"
                 ]
               },
@@ -466,10 +477,10 @@
             ]
           },
           {
-            "group": "OAuth 2.0 API",
+            "group": "Integrations",
             "pages": [
               {
-                "group": "Connect",
+                "group": "OpenID Connect",
                 "pages": [
                   "api-reference/oauth2/connect/authorize",
                   "api-reference/oauth2/connect/request-token",
@@ -479,13 +490,23 @@
                 ]
               },
               {
-                "group": "Clients",
+                "group": "OAuth 2.0 Clients",
                 "pages": [
                   "api-reference/oauth2/clients/create",
                   "api-reference/oauth2/clients/get",
                   "api-reference/oauth2/clients/list",
                   "api-reference/oauth2/clients/update",
                   "api-reference/oauth2/clients/delete"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "api-reference/webhooks/endpoints/create",
+                  "api-reference/webhooks/endpoints/get",
+                  "api-reference/webhooks/endpoints/list",
+                  "api-reference/webhooks/endpoints/update",
+                  "api-reference/webhooks/endpoints/delete"
                 ]
               }
             ]
@@ -504,7 +525,7 @@
       },
       {
         "anchor": "Support",
-        "icon": "question",
+        "icon": "square-question",
         "groups": [
           {
             "group": "Contact Us",

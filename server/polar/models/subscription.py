@@ -19,7 +19,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
-from sqlalchemy.orm.attributes import Event
+from sqlalchemy.orm.attributes import OP_BULK_REPLACE, Event
 
 from polar.custom_field.data import CustomFieldDataMixin
 from polar.enums import SubscriptionRecurringInterval
@@ -131,10 +131,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
     )
 
     customer_id: Mapped[UUID] = mapped_column(
-        Uuid,
-        ForeignKey("customers.id", ondelete="cascade"),
-        nullable=False,
-        index=True,
+        Uuid, ForeignKey("customers.id", ondelete="cascade"), nullable=False, index=True
     )
 
     @declared_attr
@@ -255,7 +252,7 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
         )
 
     def can_cancel(self, immediately: bool = False) -> bool:
-        if not SubscriptionStatus.is_active(self.status):
+        if not SubscriptionStatus.is_billable(self.status):
             return False
 
         if self.ended_at:
@@ -306,7 +303,11 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
             if is_metered_price(price.product_price)
         ]
         for price_meter in price_meters:
-            if self.get_meter(price_meter) is None:
+            try:
+                # Check if the meter already exists in the subscription
+                next(sm for sm in subscription_meters if sm.meter == price_meter)
+            except StopIteration:
+                # If it doesn't, create a new SubscriptionMeter
                 subscription_meters.append(SubscriptionMeter(meter=price_meter))
 
         # Remove old ones
@@ -323,10 +324,25 @@ class Subscription(CustomFieldDataMixin, MetadataMixin, RecordModel):
         return None
 
 
+@event.listens_for(Subscription.subscription_product_prices, "bulk_replace")
+def _prices_replaced(
+    target: Subscription, values: list["SubscriptionProductPrice"], initiator: Event
+) -> None:
+    target.update_amount_and_currency(values, target.discount)
+    target.update_meters(values)
+
+
 @event.listens_for(Subscription.subscription_product_prices, "append")
 def _price_appended(
     target: Subscription, value: "SubscriptionProductPrice", initiator: Event
 ) -> None:
+    # In case of a bulk replace, do nothing.
+    # The bulk replace event will handle the update as a whole, preventing errors
+    # where the append handler deletes a meter on first append which is still needed
+    # in subsequent appends.
+    if initiator is not None and initiator.op is OP_BULK_REPLACE:
+        return
+
     target.update_amount_and_currency(
         [*target.subscription_product_prices, value], target.discount
     )
