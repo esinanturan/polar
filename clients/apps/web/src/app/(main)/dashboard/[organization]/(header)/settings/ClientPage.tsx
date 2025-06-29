@@ -1,7 +1,6 @@
 'use client'
 
 import { DashboardBody } from '@/components/Layout/DashboardLayout'
-import FeatureSettings from '@/components/Settings/FeatureSettings'
 import OrganizationAccessTokensSettings from '@/components/Settings/OrganizationAccessTokensSettings'
 import OrganizationProfileSettings from '@/components/Settings/OrganizationProfileSettings'
 import OrganizationSubscriptionSettings from '@/components/Settings/OrganizationSubscriptionSettings'
@@ -14,21 +13,18 @@ export default function ClientPage({
   organization: schemas['Organization']
 }) {
   return (
-    <DashboardBody>
+    <DashboardBody
+      wrapperClassName="!max-w-screen-sm"
+      title="Organization Settings"
+    >
       <div className="flex flex-col gap-y-12">
         <Section id="organization">
-          <SectionDescription
-            title="Organization"
-            description="Configure your organization settings"
-          />
+          <SectionDescription title="Profile" />
           <OrganizationProfileSettings organization={org} />
         </Section>
 
         <Section id="subscriptions">
-          <SectionDescription
-            title="Subscriptions"
-            description="Configure how subscriptions are managed"
-          />
+          <SectionDescription title="Subscriptions" />
           <OrganizationSubscriptionSettings organization={org} />
         </Section>
 
@@ -38,14 +34,6 @@ export default function ClientPage({
             description="Manage access tokens to authenticate with the Polar API"
           />
           <OrganizationAccessTokensSettings organization={org} />
-        </Section>
-
-        <Section id="features">
-          <SectionDescription
-            title="Additional Features"
-            description="Legacy, experimental or early-access features."
-          />
-          <FeatureSettings organization={org} />
         </Section>
       </div>
     </DashboardBody>

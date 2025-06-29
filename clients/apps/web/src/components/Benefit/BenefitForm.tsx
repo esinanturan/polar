@@ -101,7 +101,7 @@ export const BenefitForm = ({
         }}
       />
 
-      {!update ? <BenefitTypeSelect organization={organization} /> : null}
+      {!update ? <BenefitTypeSelect /> : null}
       {type === 'custom' && <CustomBenefitForm update={update} />}
       {type === 'discord' && <DiscordBenefitForm />}
       {type === 'github_repository' && (
@@ -140,7 +140,7 @@ export const CustomBenefitForm = ({}: CustomBenefitFormProps) => {
                 <TextArea
                   {...field}
                   value={field.value || ''}
-                  placeholder="Write a secret note here. Like your private email address for premium support, Cal.com link to book consultation, etc."
+                  placeholder="Write a secret note here. Like your private email address for premium support or link to premium content."
                 />
               </FormControl>
               <FormMessage />
@@ -280,11 +280,7 @@ export const DiscordBenefitForm = () => {
   )
 }
 
-const BenefitTypeSelect = ({
-  organization,
-}: {
-  organization: schemas['Organization']
-}) => {
+const BenefitTypeSelect = () => {
   const { control } = useFormContext<schemas['BenefitCustomCreate']>()
 
   return (
@@ -304,18 +300,11 @@ const BenefitTypeSelect = ({
                   <SelectValue placeholder="Select a benefit type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {enums.benefitTypeValues
-                    .filter(
-                      (type) =>
-                        type !== 'meter_credit' ||
-                        organization.feature_settings
-                          ?.usage_based_billing_enabled,
-                    )
-                    .map((value) => (
-                      <SelectItem key={value} value={value}>
-                        {benefitsDisplayNames[value]}
-                      </SelectItem>
-                    ))}
+                  {enums.benefitTypeValues.map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {benefitsDisplayNames[value]}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FormControl>

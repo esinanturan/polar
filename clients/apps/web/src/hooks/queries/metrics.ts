@@ -17,22 +17,24 @@ export type ParsedMetricPeriod = schemas['MetricPeriod'] & {
   timestamp: Date
 }
 
-interface ParsedMetricsResponse {
+export interface ParsedMetricsResponse {
   periods: ParsedMetricPeriod[]
+  totals: schemas['MetricsTotals']
   metrics: schemas['Metrics']
 }
 
-export const useMetrics = ({
-  startDate,
-  endDate,
-  ...parameters
-}: GetMetricsRequest): UseQueryResult<ParsedMetricsResponse, Error> =>
-  useQuery({
+export const useMetrics = (
+  { startDate, endDate, ...parameters }: GetMetricsRequest,
+  enabled: boolean = true,
+): UseQueryResult<ParsedMetricsResponse, Error> => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return useQuery({
     queryKey: [
       'metrics',
       {
         startDate: toISODate(startDate),
         endDate: toISODate(endDate),
+        timezone,
         ...parameters,
       },
     ],
@@ -43,6 +45,8 @@ export const useMetrics = ({
             query: {
               start_date: toISODate(startDate),
               end_date: toISODate(endDate),
+              // @ts-expect-error
+              timezone,
               ...parameters,
             },
           },
@@ -57,4 +61,6 @@ export const useMetrics = ({
       }
     },
     retry: defaultRetry,
+    enabled,
   })
+}

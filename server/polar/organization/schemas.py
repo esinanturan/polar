@@ -16,6 +16,7 @@ from pydantic.networks import HttpUrl
 
 from polar.config import settings
 from polar.currency.schemas import CurrencyAmount
+from polar.kit.email import EmailStrDNS
 from polar.kit.schemas import (
     ORGANIZATION_ID_EXAMPLE,
     EmptyStrToNoneValidator,
@@ -40,9 +41,6 @@ OrganizationID = Annotated[
 class OrganizationFeatureSettings(Schema):
     issue_funding_enabled: bool = Field(
         False, description="If this organization has issue funding enabled"
-    )
-    usage_based_billing_enabled: bool = Field(
-        False, description="If this organization has usage-based billing enabled"
     )
 
 
@@ -255,8 +253,8 @@ class OrganizationUpdate(Schema):
     ] = None
     avatar_url: HttpUrlToStr | None = None
 
-    email: str | None = Field(None, description="Public support email.")
-    website: str | None = Field(
+    email: EmailStrDNS | None = Field(None, description="Public support email.")
+    website: HttpUrlToStr | None = Field(
         None, description="Official website of the organization."
     )
     socials: list[OrganizationSocialLink] | None = Field(

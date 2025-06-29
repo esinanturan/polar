@@ -1,3 +1,4 @@
+import uuid
 from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
@@ -12,10 +13,15 @@ from sqlalchemy.util.typing import TypeAlias
 
 from polar.auth.models import AuthSubject
 from polar.checkout.eventstream import CheckoutEvent
-from polar.enums import SubscriptionRecurringInterval
-from polar.exceptions import BadRequest, ResourceUnavailable
+from polar.enums import SubscriptionProrationBehavior, SubscriptionRecurringInterval
+from polar.exceptions import (
+    BadRequest,
+    PolarRequestValidationError,
+    ResourceUnavailable,
+)
 from polar.integrations.stripe.service import StripeService
 from polar.kit.pagination import PaginationParams
+from polar.locker import Locker
 from polar.meter.aggregation import AggregationFunction, PropertyAggregation
 from polar.meter.filter import Filter, FilterConjunction
 from polar.models import (
@@ -59,6 +65,7 @@ from tests.fixtures.random_objects import (
     set_product_benefits,
 )
 from tests.fixtures.stripe import (
+    build_stripe_payment_method,
     cloned_stripe_canceled_subscription,
     cloned_stripe_subscription,
     construct_stripe_subscription,
@@ -201,6 +208,10 @@ class TestCreateOrUpdateFromCheckout:
             customer=customer,
         )
 
+        stripe_payment_method = build_stripe_payment_method(
+            customer=customer.stripe_customer_id,
+        )
+        stripe_service_mock.get_payment_method.return_value = stripe_payment_method
         stripe_subscription = construct_stripe_subscription(product=product)
         stripe_service_mock.create_out_of_band_subscription.return_value = (
             stripe_subscription,
@@ -216,6 +227,8 @@ class TestCreateOrUpdateFromCheckout:
         assert subscription.status == stripe_subscription.status
         assert subscription.prices == product.prices
         assert subscription.amount == checkout.total_amount
+        assert subscription.payment_method is not None
+        assert subscription.payment_method.processor_id == stripe_payment_method.id
 
         stripe_service_mock.create_out_of_band_subscription.assert_called_once()
         stripe_service_mock.set_automatically_charged_subscription.assert_called_once()
@@ -242,6 +255,10 @@ class TestCreateOrUpdateFromCheckout:
             currency="usd",
         )
 
+        stripe_payment_method = build_stripe_payment_method(
+            customer=customer.stripe_customer_id,
+        )
+        stripe_service_mock.get_payment_method.return_value = stripe_payment_method
         stripe_subscription = construct_stripe_subscription(
             product=product_recurring_custom_price
         )
@@ -263,12 +280,20 @@ class TestCreateOrUpdateFromCheckout:
         assert subscription.prices == product_recurring_custom_price.prices
         assert subscription.amount == checkout.total_amount
         assert subscription.currency == checkout.currency
+        assert subscription.payment_method is not None
+        assert subscription.payment_method.processor_id == stripe_payment_method.id
 
         stripe_service_mock.create_ad_hoc_custom_price.assert_called_once()
         stripe_service_mock.create_out_of_band_subscription.assert_called_once()
         assert stripe_service_mock.create_out_of_band_subscription.call_args[1][
             "prices"
         ] == ["STRIPE_CUSTOM_PRICE_ID"]
+        assert (
+            stripe_service_mock.create_out_of_band_subscription.call_args[1][
+                "automatic_tax"
+            ]
+            is True
+        )
         stripe_service_mock.set_automatically_charged_subscription.assert_called_once()
 
         publish_checkout_event_mock.assert_called_once_with(
@@ -307,6 +332,7 @@ class TestCreateOrUpdateFromCheckout:
         assert subscription.prices == product_recurring_free_price.prices
         assert subscription.amount == 0
         assert subscription.currency == "usd"
+        assert subscription.payment_method is None
 
         stripe_service_mock.create_out_of_band_subscription.assert_called_once()
         assert (
@@ -442,6 +468,10 @@ class TestCreateOrUpdateFromCheckout:
             subscription=subscription,
         )
 
+        stripe_payment_method = build_stripe_payment_method(
+            customer=customer.stripe_customer_id,
+        )
+        stripe_service_mock.get_payment_method.return_value = stripe_payment_method
         stripe_subscription = construct_stripe_subscription(product=product)
         stripe_service_mock.update_out_of_band_subscription.return_value = (
             stripe_subscription,
@@ -458,6 +488,8 @@ class TestCreateOrUpdateFromCheckout:
         assert subscription.prices == product.prices
         assert subscription.amount == checkout.total_amount
         assert subscription.currency == checkout.currency
+        assert subscription.payment_method is not None
+        assert subscription.payment_method.processor_id == stripe_payment_method.id
 
         stripe_service_mock.update_out_of_band_subscription.assert_called_once()
         stripe_service_mock.set_automatically_charged_subscription.assert_called_once()
@@ -468,20 +500,21 @@ class TestCreateOrUpdateFromCheckout:
 
 
 @pytest.mark.asyncio
-class TestUpdateSubscriptionFromStripe:
+class TestUpdateFromStripe:
     async def test_not_existing_subscription(
         self, session: AsyncSession, product: Product
     ) -> None:
         stripe_subscription = construct_stripe_subscription(product=product)
 
         with pytest.raises(SubscriptionDoesNotExist):
-            await subscription_service.update_subscription_from_stripe(
+            await subscription_service.update_from_stripe(
                 session, stripe_subscription=stripe_subscription
             )
 
     async def test_valid(
         self,
         mocker: MockerFixture,
+        stripe_service_mock: MagicMock,
         session: AsyncSession,
         save_fixture: SaveFixture,
         product: Product,
@@ -491,9 +524,14 @@ class TestUpdateSubscriptionFromStripe:
             subscription_service, "enqueue_benefits_grants"
         )
 
+        stripe_payment_method = build_stripe_payment_method(
+            customer=customer.stripe_customer_id,
+        )
+        stripe_service_mock.get_payment_method.return_value = stripe_payment_method
         stripe_subscription = construct_stripe_subscription(
             product=product,
             status=SubscriptionStatus.active,
+            default_payment_method=stripe_payment_method.id,
         )
         subscription = await create_subscription(
             save_fixture,
@@ -503,14 +541,16 @@ class TestUpdateSubscriptionFromStripe:
         )
         assert subscription.started_at is None
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.active
         assert updated_subscription.started_at is not None
+        assert updated_subscription.payment_method is not None
+        assert (
+            updated_subscription.payment_method.processor_id == stripe_payment_method.id
+        )
 
         enqueue_benefits_grants_mock.assert_called_once()
 
@@ -539,10 +579,8 @@ class TestUpdateSubscriptionFromStripe:
         )
         assert subscription.discount is not None
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.discount is None
@@ -566,10 +604,8 @@ class TestUpdateSubscriptionFromStripe:
         )
         stripe_subscription = cloned_stripe_canceled_subscription(subscription)
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.active
@@ -635,10 +671,8 @@ class TestUpdateSubscriptionFromStripe:
             subscription, cancel_at_period_end=True
         )
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.active
@@ -648,10 +682,8 @@ class TestUpdateSubscriptionFromStripe:
         assert_hooks_called_once(subscription_hooks, {"updated", "canceled"})
         reset_hooks(subscription_hooks)
 
-        repeat_cancellation = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        repeat_cancellation = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
         assert repeat_cancellation.status == SubscriptionStatus.active
         assert repeat_cancellation.cancel_at_period_end is True
@@ -704,10 +736,8 @@ class TestUpdateSubscriptionFromStripe:
             subscription, cancel_at_period_end=False
         )
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.active
@@ -735,10 +765,8 @@ class TestUpdateSubscriptionFromStripe:
             subscription, revoke=True
         )
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.canceled
@@ -778,10 +806,8 @@ class TestUpdateSubscriptionFromStripe:
             subscription,
         )
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.active
@@ -794,10 +820,8 @@ class TestUpdateSubscriptionFromStripe:
             updated_subscription, revoke=True
         )
 
-        updated_subscription = (
-            await subscription_service.update_subscription_from_stripe(
-                session, stripe_subscription=stripe_subscription
-            )
+        updated_subscription = await subscription_service.update_from_stripe(
+            session, stripe_subscription=stripe_subscription
         )
 
         assert updated_subscription.status == SubscriptionStatus.canceled
@@ -1196,6 +1220,223 @@ class TestList:
 
         assert len(results) == 1
         assert count == 1
+
+    @pytest.mark.auth
+    async def test_metadata_filter(
+        self,
+        auth_subject: AuthSubject[Organization],
+        session: AsyncSession,
+        save_fixture: SaveFixture,
+        user_organization: UserOrganization,
+        product: Product,
+        customer: Customer,
+    ) -> None:
+        subscription_1 = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "ABC"},
+        )
+        subscription_2 = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "DEF"},
+        )
+        await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            user_metadata={"reference_id": "GHI"},
+        )
+
+        # then
+        session.expunge_all()
+
+        results, count = await subscription_service.list(
+            session,
+            auth_subject,
+            pagination=PaginationParams(1, 10),
+            metadata={"reference_id": ["ABC", "DEF"]},
+        )
+
+        assert len(results) == 2
+        assert count == 2
+
+        assert subscription_1 in results
+        assert subscription_2 in results
+
+
+@pytest.mark.asyncio
+class TestUpdateProduct:
+    async def test_meters(
+        self,
+        session: AsyncSession,
+        save_fixture: SaveFixture,
+        meter: Meter,
+        product_recurring_fixed_and_metered: Product,
+        customer: Customer,
+        organization: Organization,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture, product=product_recurring_fixed_and_metered, customer=customer
+        )
+        assert len(subscription.meters) == 1
+        subscription_meter = subscription.meters[0]
+        assert subscription_meter.meter == meter
+        assert subscription_meter.subscription == subscription
+
+        new_product = await create_product(
+            save_fixture,
+            organization=organization,
+            recurring_interval=SubscriptionRecurringInterval.month,
+            # Same meter, but the price comes after the fixed price
+            # It's important to test that the order of prices does not matter
+            prices=[(3000,), (meter, Decimal(50), None)],
+        )
+
+        updated_subscription = await subscription_service.update_product(
+            session,
+            subscription,
+            product_id=new_product.id,
+            proration_behavior=SubscriptionProrationBehavior.prorate,
+        )
+        await session.flush()
+
+        assert updated_subscription.product == new_product
+        assert len(updated_subscription.meters) == 1
+        updated_subscription_meter = updated_subscription.meters[0]
+        assert updated_subscription_meter.meter == meter
+        assert updated_subscription_meter.subscription == updated_subscription
+
+
+@pytest.mark.asyncio
+class TestUpdateDiscount:
+    async def test_not_existing_discount(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        with pytest.raises(PolarRequestValidationError):
+            await subscription_service.update_discount(
+                session, locker, subscription, discount_id=uuid.uuid4()
+            )
+
+    async def test_same_discount(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        discount_percentage_100: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        with pytest.raises(PolarRequestValidationError):
+            await subscription_service.update_discount(
+                session, locker, subscription, discount_id=discount_percentage_50.id
+            )
+
+    async def test_valid_removed(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=None
+        )
+
+        assert subscription.discount is None
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            discount_percentage_50.stripe_coupon_id,
+            None,
+        )
+
+    async def test_valid_added(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture, product=product, customer=customer
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=discount_percentage_50.id
+        )
+
+        assert subscription.discount == discount_percentage_50
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            None,
+            discount_percentage_50.stripe_coupon_id,
+        )
+
+    async def test_valid_modified(
+        self,
+        save_fixture: SaveFixture,
+        session: AsyncSession,
+        locker: Locker,
+        product: Product,
+        customer: Customer,
+        discount_percentage_50: Discount,
+        discount_percentage_100: Discount,
+        stripe_service_mock: MagicMock,
+    ) -> None:
+        subscription = await create_active_subscription(
+            save_fixture,
+            product=product,
+            customer=customer,
+            discount=discount_percentage_50,
+        )
+
+        subscription = await subscription_service.update_discount(
+            session, locker, subscription, discount_id=discount_percentage_100.id
+        )
+
+        assert subscription.discount == discount_percentage_100
+        stripe_service_mock.update_subscription_discount.assert_called_once_with(
+            subscription.stripe_subscription_id,
+            discount_percentage_50.stripe_coupon_id,
+            discount_percentage_100.stripe_coupon_id,
+        )
 
 
 @pytest.mark.asyncio

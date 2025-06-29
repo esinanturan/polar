@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, Literal
 
 from annotated_types import Ge, Le
 from pydantic import (
@@ -10,7 +10,6 @@ from pydantic import (
     HttpUrl,
     IPvAnyAddress,
     Tag,
-    computed_field,
 )
 from pydantic.json_schema import SkipJsonSchema
 
@@ -27,6 +26,7 @@ from polar.discount.schemas import (
 )
 from polar.enums import PaymentProcessor
 from polar.kit.address import Address
+from polar.kit.email import EmailStrDNS
 from polar.kit.metadata import (
     METADATA_DESCRIPTION,
     MetadataField,
@@ -34,14 +34,13 @@ from polar.kit.metadata import (
     MetadataOutputMixin,
 )
 from polar.kit.schemas import (
-    EmailStrDNS,
     EmptyStrToNoneValidator,
     IDSchema,
     Schema,
     SetSchemaReference,
     TimestampedSchema,
 )
-from polar.models.checkout import CheckoutStatus
+from polar.models.checkout import CheckoutCustomerBillingAddressFields, CheckoutStatus
 from polar.models.discount import DiscountDuration, DiscountType
 from polar.organization.schemas import Organization
 from polar.product.schemas import (
@@ -124,6 +123,11 @@ _require_billing_address_description = (
     "If you preset the billing address, this setting will be automatically set to "
     "`true`."
 )
+_is_business_customer_description = (
+    "Whether the customer is a business or an individual. "
+    "If `true`, the customer will be required to fill their full billing address "
+    "and billing name."
+)
 _customer_metadata_description = METADATA_DESCRIPTION.format(
     heading=(
         "Key-value object allowing you to store additional information "
@@ -158,12 +162,18 @@ class CheckoutCreateBase(CustomFieldDataInputMixin, MetadataInputMixin, Schema):
             "The resulting order will be linked to this customer."
         ),
     )
-    customer_external_id: str | None = Field(
-        default=None, description=_external_customer_id_description
+    is_business_customer: bool = Field(
+        default=False, description=_is_business_customer_description
+    )
+    external_customer_id: str | None = Field(
+        default=None,
+        description=_external_customer_id_description,
+        validation_alias=AliasChoices("external_customer_id", "customer_external_id"),
     )
     customer_name: Annotated[CustomerName | None, EmptyStrToNoneValidator] = None
     customer_email: CustomerEmail | None = None
     customer_ip_address: CustomerIPAddress | None = None
+    customer_billing_name: Annotated[str | None, EmptyStrToNoneValidator] = None
     customer_billing_address: CustomerBillingAddress | None = None
     customer_tax_id: Annotated[str | None, EmptyStrToNoneValidator] = None
     customer_metadata: MetadataField = Field(
@@ -272,8 +282,10 @@ class CheckoutUpdateBase(CustomFieldDataInputMixin, Schema):
         ),
     )
     amount: Amount | None = None
+    is_business_customer: bool | None = None
     customer_name: Annotated[CustomerName | None, EmptyStrToNoneValidator] = None
     customer_email: CustomerEmail | None = None
+    customer_billing_name: Annotated[str | None, EmptyStrToNoneValidator] = None
     customer_billing_address: CustomerBillingAddress | None = None
     customer_tax_id: Annotated[str | None, EmptyStrToNoneValidator] = None
 
@@ -322,30 +334,6 @@ class CheckoutConfirmStripe(CheckoutConfirmBase):
 
 
 CheckoutConfirm = CheckoutConfirmStripe
-
-
-class CheckoutCustomerBillingAddressFields(Schema):
-    country: bool
-    state: bool
-    city: bool
-    postal_code: bool
-    line1: bool
-    line2: bool
-
-    @classmethod
-    def from_checkout(cls, checkout: "CheckoutBase") -> Self:
-        address = checkout.customer_billing_address
-        country = address.country if address else None
-        is_us = country == "US"
-        require_billing_address = checkout.require_billing_address or is_us
-        return cls(
-            country=True,
-            state=require_billing_address or country in {"US", "CA"},
-            line1=require_billing_address,
-            line2=require_billing_address,
-            city=require_billing_address,
-            postal_code=require_billing_address,
-        )
 
 
 class CheckoutBase(CustomFieldDataOutputMixin, IDSchema, TimestampedSchema):
@@ -424,9 +412,11 @@ class CheckoutBase(CustomFieldDataOutputMixin, IDSchema, TimestampedSchema):
     )
 
     customer_id: UUID4 | None
+    is_business_customer: bool = Field(description=_is_business_customer_description)
     customer_name: str | None = Field(description="Name of the customer.")
     customer_email: str | None = Field(description="Email address of the customer.")
     customer_ip_address: CustomerIPAddress | None
+    customer_billing_name: str | None
     customer_billing_address: CustomerBillingAddress | None
     customer_tax_id: str | None = Field(
         validation_alias=AliasChoices("customer_tax_id_number", "customer_tax_id")
@@ -438,10 +428,12 @@ class CheckoutBase(CustomFieldDataOutputMixin, IDSchema, TimestampedSchema):
         deprecated="Use `net_amount`.", validation_alias="net_amount"
     )
 
-    @computed_field
-    def customer_billing_address_fields(self) -> CheckoutCustomerBillingAddressFields:
-        """Determine which billing address fields should be shown in the checkout form."""
-        return CheckoutCustomerBillingAddressFields.from_checkout(self)
+    customer_billing_address_fields: CheckoutCustomerBillingAddressFields = Field(
+        description=(
+            "Determine which billing address fields "
+            "should be shown in the checkout form."
+        )
+    )
 
 
 class CheckoutProduct(ProductBase):
@@ -518,8 +510,13 @@ CheckoutDiscount = Annotated[
 class Checkout(MetadataOutputMixin, CheckoutBase):
     """Checkout session data retrieved using an access token."""
 
+    external_customer_id: str | None = Field(
+        description=_external_customer_id_description,
+        validation_alias=AliasChoices("external_customer_id", "customer_external_id"),
+    )
     customer_external_id: str | None = Field(
-        description=_external_customer_id_description
+        validation_alias=AliasChoices("external_customer_id", "customer_external_id"),
+        deprecated="Use `external_customer_id` instead.",
     )
     products: list[CheckoutProduct] = Field(
         description="List of products available to select."
