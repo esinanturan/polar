@@ -65,7 +65,12 @@ const CountryPicker = ({
   return (
     <Select onValueChange={onChange} value={value} autoComplete={autoComplete}>
       <SelectTrigger className={className}>
-        <SelectValue placeholder="Country" />
+        <SelectValue
+          placeholder="Country"
+          // Avoids issues due to browser automatic translation
+          // https://github.com/shadcn-ui/ui/issues/852
+          translate="no"
+        />
       </SelectTrigger>
       <SelectContent className={contentClassName}>
         {countryMap.map(({ code, country, emoji }) => (
@@ -75,7 +80,11 @@ const CountryPicker = ({
             textValue={country.name}
             className={itemClassName}
           >
-            {emoji} {country.name}
+            {/* Wrap in div to workaround an issue with browser automatic translation
+              https://github.com/shadcn-ui/ui/issues/852 */}
+            <div>
+              {emoji} {country.name}
+            </div>
           </SelectItem>
         ))}
       </SelectContent>

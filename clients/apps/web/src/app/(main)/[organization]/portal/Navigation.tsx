@@ -20,6 +20,11 @@ const links = (organization: schemas['Organization']) => [
     isActive: (path: string) => path.includes('/overview'),
   },
   {
+    href: `/${organization.slug}/portal/orders`,
+    label: 'Orders',
+    isActive: (path: string) => path.includes('/orders'),
+  },
+  {
     href: `/${organization.slug}/portal/usage`,
     label: 'Usage',
     isActive: (path: string) => path.includes('/usage'),
@@ -46,15 +51,11 @@ export const Navigation = ({
     return `${path}?${searchParams.toString()}`
   }
 
-  const filteredLinks = links(organization).filter(({ label }) =>
-    label === 'Usage'
-      ? organization.feature_settings?.usage_based_billing_enabled
-      : true,
-  )
+  const filteredLinks = links(organization)
 
   return (
     <>
-      <nav className="hidden w-64 flex-col gap-y-1 py-12 md:flex">
+      <nav className="sticky top-0 hidden h-fit w-64 flex-col gap-y-1 py-12 md:flex">
         {filteredLinks.map((link) => (
           <Link
             key={link.href}

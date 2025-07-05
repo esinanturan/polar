@@ -16,6 +16,7 @@ from pydantic.networks import HttpUrl
 
 from polar.config import settings
 from polar.currency.schemas import CurrencyAmount
+from polar.kit.email import EmailStrDNS
 from polar.kit.schemas import (
     ORGANIZATION_ID_EXAMPLE,
     EmptyStrToNoneValidator,
@@ -27,7 +28,10 @@ from polar.kit.schemas import (
     SlugValidator,
     TimestampedSchema,
 )
-from polar.models.organization import OrganizationSubscriptionSettings
+from polar.models.organization import (
+    OrganizationNotificationSettings,
+    OrganizationSubscriptionSettings,
+)
 
 OrganizationID = Annotated[
     UUID4,
@@ -40,9 +44,6 @@ OrganizationID = Annotated[
 class OrganizationFeatureSettings(Schema):
     issue_funding_enabled: bool = Field(
         False, description="If this organization has issue funding enabled"
-    )
-    usage_based_billing_enabled: bool = Field(
-        False, description="If this organization has usage-based billing enabled"
     )
 
 
@@ -188,6 +189,9 @@ class Organization(IDSchema, TimestampedSchema):
     subscription_settings: OrganizationSubscriptionSettings = Field(
         description="Settings related to subscriptions management",
     )
+    notification_settings: OrganizationNotificationSettings = Field(
+        description="Settings related to notifications",
+    )
 
     # Deprecated attributes
     bio: SkipJsonSchema[str | None] = Field(..., deprecated="")
@@ -247,6 +251,7 @@ class OrganizationCreate(Schema):
     )
     feature_settings: OrganizationFeatureSettings | None = None
     subscription_settings: OrganizationSubscriptionSettings | None = None
+    notification_settings: OrganizationNotificationSettings | None = None
 
 
 class OrganizationUpdate(Schema):
@@ -255,8 +260,8 @@ class OrganizationUpdate(Schema):
     ] = None
     avatar_url: HttpUrlToStr | None = None
 
-    email: str | None = Field(None, description="Public support email.")
-    website: str | None = Field(
+    email: EmailStrDNS | None = Field(None, description="Public support email.")
+    website: HttpUrlToStr | None = Field(
         None, description="Official website of the organization."
     )
     socials: list[OrganizationSocialLink] | None = Field(
@@ -269,6 +274,7 @@ class OrganizationUpdate(Schema):
 
     feature_settings: OrganizationFeatureSettings | None = None
     subscription_settings: OrganizationSubscriptionSettings | None = None
+    notification_settings: OrganizationNotificationSettings | None = None
 
 
 class OrganizationSetAccount(Schema):

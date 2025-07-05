@@ -152,6 +152,10 @@ const ORGANIZATION: schemas['Organization'] = {
     allow_customer_updates: true,
     proration_behavior: 'invoice',
   },
+  notification_settings: {
+    new_order: true,
+    new_subscription: true,
+  },
 }
 
 export const createCheckoutPreview = (
@@ -203,9 +207,11 @@ export const createCheckoutPreview = (
     is_payment_setup_required: price.type === 'recurring',
     is_payment_form_required: amount > 0 || price.type === 'recurring',
     currency: 'usd',
+    is_business_customer: false,
     customer_id: null,
     customer_email: 'janedoe@gmail.com',
     customer_name: 'Jane Doe',
+    customer_billing_name: null,
     customer_billing_address: null,
     customer_ip_address: null,
     customer_tax_id: null,
@@ -227,6 +233,14 @@ export const createCheckoutPreview = (
       line1: false,
       line2: false,
     },
+    billing_address_fields: {
+      country: 'required',
+      state: 'disabled',
+      city: 'disabled',
+      postal_code: 'disabled',
+      line1: 'disabled',
+      line2: 'disabled',
+    },
   })
 
   return {
@@ -243,8 +257,15 @@ export const CHECKOUT_PREVIEW = createCheckoutPreview(
 
 export const ORDER_PREVIEW: schemas['CustomerOrder'] = {
   id: '123',
+  created_at: new Date().toISOString(),
+  modified_at: new Date().toISOString(),
+  billing_reason: 'subscription_create',
+  billing_name: null,
+  billing_address: null,
+  is_invoice_generated: false,
   status: 'paid',
   paid: true,
+  amount: 10000,
   subtotal_amount: 10000,
   discount_amount: 0,
   net_amount: 10000,
@@ -262,8 +283,6 @@ export const ORDER_PREVIEW: schemas['CustomerOrder'] = {
     ...PRODUCT_PREVIEW,
     organization: ORGANIZATION,
   },
-  created_at: new Date().toISOString(),
-  modified_at: new Date().toISOString(),
   items: [
     {
       created_at: new Date().toISOString(),
@@ -276,6 +295,8 @@ export const ORDER_PREVIEW: schemas['CustomerOrder'] = {
       product_price_id: PRODUCT_PREVIEW.prices[0].id,
     },
   ],
+  discount_id: null,
+  checkout_id: CHECKOUT_PREVIEW.id,
 }
 
 export const SUBSCRIPTION_ORDER_PREVIEW: schemas['CustomerSubscription'] = {

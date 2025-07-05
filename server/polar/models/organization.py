@@ -6,6 +6,7 @@ from sqlalchemy import (
     TIMESTAMP,
     ColumnElement,
     ForeignKey,
+    Integer,
     String,
     UniqueConstraint,
     Uuid,
@@ -38,6 +39,17 @@ class OrganizationDetails(TypedDict):
     switching: bool
     switching_from: str | None
     previous_annual_revenue: int
+
+
+class OrganizationNotificationSettings(TypedDict):
+    new_order: bool
+    new_subscription: bool
+
+
+_default_notification_settings: OrganizationNotificationSettings = {
+    "new_order": True,
+    "new_subscription": True,
+}
 
 
 class OrganizationSubscriptionSettings(TypedDict):
@@ -73,10 +85,13 @@ class Organization(RecordModel):
         TIMESTAMP(timezone=True)
     )
 
+    customer_invoice_prefix: Mapped[str] = mapped_column(String, nullable=False)
+    customer_invoice_next_number: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1
+    )
+
     account_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey("accounts.id", ondelete="set null"),
-        nullable=True,
+        Uuid, ForeignKey("accounts.id", ondelete="set null"), nullable=True
     )
 
     @declared_attr
@@ -98,6 +113,10 @@ class Organization(RecordModel):
 
     subscription_settings: Mapped[OrganizationSubscriptionSettings] = mapped_column(
         JSONB, nullable=False, default=_default_subscription_settings
+    )
+
+    notification_settings: Mapped[OrganizationNotificationSettings] = mapped_column(
+        JSONB, nullable=False, default=_default_notification_settings
     )
 
     #
@@ -178,3 +197,7 @@ class Organization(RecordModel):
         if self.blocked_at is not None:
             return True
         return False
+
+    @property
+    def statement_descriptor(self) -> str:
+        return self.slug[: settings.stripe_descriptor_suffix_max_length]
